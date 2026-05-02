@@ -1,6 +1,10 @@
 package com.example.tagscanner.core.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,41 +18,48 @@ import com.example.tagscanner.feature.history.HistoryScreen
 fun AppNavHost() {
     val navController = rememberNavController()
 
-    NavHost(
-        navController = navController,
-        startDestination = Route.Home.route
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .safeDrawingPadding()
     ) {
-        composable(Route.Home.route) {
-            HomeScreen(
-                onLiveScanClick = {
-                    navController.navigate(Route.LiveScan.route)
-                },
-                onGalleryScanClick = {
-                    navController.navigate(Route.GalleryScan.route)
-                },
-                onDashboardClick = {
-                    navController.navigate(Route.Dashboard.route)
-                },
-                onHistoryClick = {
-                    navController.navigate(Route.History.route)
-                }
-            )
-        }
 
-        composable(Route.LiveScan.route) {
-            LiveScanScreen()
-        }
+        NavHost(
+            navController = navController,
+            startDestination = Route.Home.route
+        ) {
+            composable(Route.Home.route) {
+                HomeScreen(
+                    onLiveScanClick = {
+                        navController.navigate(Route.LiveScan.route)
+                    },
+                    onGalleryScanClick = {
+                        navController.navigate(Route.GalleryScan.route)
+                    },
+                    onDashboardClick = {
+                        navController.navigate(Route.Dashboard.route)
+                    },
+                    onHistoryClick = {
+                        navController.navigate(Route.History.route)
+                    }
+                )
+            }
 
-        composable(Route.GalleryScan.route) {
-            GalleryScanScreen()
-        }
+            composable(Route.LiveScan.route) {
+                LiveScanScreen()
+            }
 
-        composable(Route.Dashboard.route) {
-            DashboardScreen()
-        }
+            composable(Route.GalleryScan.route) {
+                GalleryScanScreen()
+            }
 
-        composable(Route.History.route) {
-            HistoryScreen()
+            composable(Route.Dashboard.route) {
+                DashboardScreen()
+            }
+
+            composable(Route.History.route) {
+                HistoryScreen()
+            }
         }
     }
 }

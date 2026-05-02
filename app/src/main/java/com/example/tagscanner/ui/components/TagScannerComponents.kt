@@ -1,0 +1,197 @@
+package com.example.tagscanner.ui.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.example.tagscanner.core.util.formatTimestamp
+import com.example.tagscanner.domain.model.InterpretationSeverity
+import com.example.tagscanner.domain.model.ScanResult
+import com.example.tagscanner.domain.model.ScanSource
+
+private val AppBlue = Color(0xFF2563EB)
+private val PageBackground = Color(0xFFF9FAFB)
+
+fun Modifier.screenBackground() = this.background(PageBackground)
+
+@Composable
+fun ActionTitle(
+    title: String,
+    subtitle: String,
+    primary: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val background = if (primary) AppBlue else Color.White
+    val titleColor = if (primary) Color.White else Color(0xFF111827)
+    val subtitleColor = if (primary) Color(0xFFDBEAFE) else Color(0xFF6B7280)
+
+    Card(
+        modifier = modifier
+            .height(132.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = background),
+        border = if (primary) null else CardDefaults.outlinedCardBorder(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            Text(title, color = titleColor, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(4.dp))
+            Text(subtitle, color = subtitleColor, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
+fun ColorSwatch(
+    color: Color,
+    size: Int = 48
+) {
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .background(color, RoundedCornerShape(10.dp))
+            .border(2.dp, Color(0xFFE5E7EB), RoundedCornerShape(10.dp))
+    )
+}
+
+@Composable
+fun StatusBadge(severity: InterpretationSeverity) {
+    val background: Color
+    val foreground: Color
+    val label: String
+
+    when (severity) {
+        InterpretationSeverity.NORMAL -> {
+            background = Color(0xFFDCFCE7)
+            foreground = Color(0xFF166534)
+            label = "Normal"
+        }
+        InterpretationSeverity.WARNING -> {
+            background = Color(0xFFFEF3C7)
+            foreground = Color(0xFF92400E)
+            label = "Warning"
+        }
+        InterpretationSeverity.CRITICAL -> {
+            background = Color(0xFFFEE2E2)
+            foreground = Color(0xFF991B1B)
+            label = "Critical"
+        }
+        InterpretationSeverity.UNKNOWN -> {
+            background = Color(0xFFF3F4F6)
+            foreground = Color(0xFF374151)
+            label = "Unknown"
+        }
+    }
+
+    Surface(
+        color = background,
+        contentColor = foreground,
+        shape = CircleShape
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+fun ScanCard(
+    scan: ScanResult,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val measurement = scan.colorMeasurement
+    val swatch = Color(measurement.red, measurement.green, measurement.blue)
+    val sourceLabel = when (scan.source) {
+        ScanSource.LIVE_CAMERA -> "Live Camera"
+        ScanSource.GALLERY_IMAGE -> "Gallery Image"
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ColorSwatch(color = swatch)
+
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = scan.interpretation.label,
+                        modifier = Modifier.weight(1f),
+                        color = Color(0xFF111827),
+                        fontWeight = FontWeight.Medium
+                    )
+                    StatusBadge(scan.interpretation.severity)
+                }
+
+                Spacer(Modifier.height(6.dp))
+
+                Text(
+                    text = "$sourceLabel • ${formatTimestamp(scan.timestampMillis)}",
+                    color = Color(0xFF6B7280),
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                Spacer(Modifier.height(4.dp))
+
+                Text(
+                    text = "Confidence: ${(measurement.confidence * 100).toInt()}%",
+                    color = Color(0xFF6B7280),
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun EmptyState(
+    title: String,
+    description: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 40.dp, horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .background(Color(0xFFF3F4F6), CircleShape)
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(title, fontWeight = FontWeight.Medium, color = Color(0xFF111827))
+        Spacer(Modifier.height(4.dp))
+        Text(description, color = Color(0xFF6B7280), style = MaterialTheme.typography.bodySmall)
+    }
+}
+
