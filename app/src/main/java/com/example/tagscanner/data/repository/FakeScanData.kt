@@ -71,6 +71,27 @@ object FakeScanData {
             ),
             regionOfInterest = null,
             note = "Sample critical scan"
+        ),
+        ScanResult(
+            id = 4,
+            timestampMillis = System.currentTimeMillis() - 1000L * 60 * 60 * 5,
+            source = ScanSource.LIVE_CAMERA,
+            colorMeasurement = ColorMeasurement(
+                red = 159,
+                green = 43,
+                blue = 104,
+                hue = 2f,
+                saturation = 0.83f,
+                value = 0.82f,
+                confidence = 0.88f
+            ),
+            interpretation = ColorInterpretation(
+                label = "Purple",
+                description = "Tag indicates unknown state",
+                severity = InterpretationSeverity.UNKNOWN
+            ),
+            regionOfInterest = null,
+            note = "Sample unknown scan"
         )
     )
 }
