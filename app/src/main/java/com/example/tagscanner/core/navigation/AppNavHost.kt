@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,6 +20,7 @@ import com.example.tagscanner.feature.live.LiveScanScreen
 import com.example.tagscanner.feature.gallery.GalleryScanScreen
 import com.example.tagscanner.feature.dashboard.DashboardScreen
 import com.example.tagscanner.feature.history.HistoryScreen
+import com.example.tagscanner.feature.home.HomeViewModel
 import com.example.tagscanner.ui.components.BottomNavBar
 
 @Composable
@@ -48,19 +51,16 @@ fun AppNavHost() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Route.Home.route) {
+
+                val homeViewModel: HomeViewModel = viewModel()
+                val uiState by homeViewModel.uiState.collectAsState()
+
                 HomeScreen(
-                    onLiveScanClick = {
-                        navController.navigate(Route.LiveScan.route)
-                    },
-                    onGalleryScanClick = {
-                        navController.navigate(Route.LiveScan.route)
-                    },
-                    onDashboardClick = {
-                        navController.navigate(Route.Dashboard.route)
-                    },
-                    onHistoryClick = {
-                        navController.navigate(Route.History.route)
-                    }
+                   uiState = uiState,
+                    onLiveScanClick = {navController.navigate(Route.LiveScan.route) },
+                    onGalleryScanClick = { navController.navigate(Route.GalleryScan.route) },
+                    onDashboardClick = { navController.navigate(Route.Dashboard.route) },
+                    onHistoryClick = { navController.navigate(Route.History.route) }
                 )
             }
 

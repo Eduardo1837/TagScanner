@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,11 +30,11 @@ import com.example.tagscanner.ui.components.screenBackground
 
 @Composable
 fun HomeScreen(
+    uiState: HomeUiState,
     onLiveScanClick: () -> Unit,
     onGalleryScanClick: () -> Unit,
     onDashboardClick: () -> Unit,
     onHistoryClick: () -> Unit,
-    recentScans: List<ScanResult> = emptyList(),
 ) {
     Column(
         modifier = Modifier
@@ -40,66 +43,68 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
+        Text("Tag Scanner", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text(
-            text = "Tag Scanner",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF111827)
+            "Analyze tags using live camera or images from gallery.",
+            color = Color(0xFF6B7280),
+            style = MaterialTheme.typography.bodyMedium
         )
-
-        Spacer(Modifier.height(4.dp))
-
-       Text(
-           text = "Analyze colored tags",
-           style = MaterialTheme.typography.bodyMedium,
-           color = Color(0xFF6B7280)
-       )
 
         Spacer(Modifier.height(20.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)){
-            ActionTitle(
-                title = "Live Scan",
-                subtitle = "Real-time camera",
-                primary = true,
-                onClick = onLiveScanClick,
-                modifier = Modifier.weight(1f)
-            )
-
-            ActionTitle(
-                title = "Pick Image",
-                subtitle = "From gallery",
-                primary = false,
-                onClick = onGalleryScanClick,
-                modifier = Modifier.weight(1f)
-            )
+            ActionTitle("Live Scan", "Real-time camera", true, onLiveScanClick, Modifier.weight(1f))
+            ActionTitle("Pick Image", "From gallery", false, onGalleryScanClick, Modifier.weight(1f))
         }
+
+       if(uiState.totalScans > 0){
+           Spacer(Modifier.height(16.dp))
+
+           Card(
+               colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF6FF)),
+               elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+           ) {
+               Row(
+                   modifier = Modifier
+                       .fillMaxWidth()
+                       .padding(16.dp),
+                   horizontalArrangement = Arrangement.SpaceBetween
+               ) {
+                   QuickStat(uiState.totalScans.toString(), "Total scans")
+                   QuickStat(uiState.latestResult ?: "-", "Latest result")
+                   QuickStat("${uiState.latestConfidence ?: 0}%", "Confidence")
+               }
+           }
+       }
 
         Spacer(Modifier.height(20.dp))
 
-        Text(
-            text = "Recent Scans",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF111827)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Recent Scans", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text("View all", color = Color(0xFF2563EB), modifier = Modifier.padding(top = 2.dp))
+        }
 
         Spacer(Modifier.height(12.dp))
 
-        if(recentScans.isEmpty()){
-            EmptyState(
-                title = "No scans yet",
-                description = "Start scanning tags to see history here"
-            )
+        if(uiState.recentScans.isEmpty()){
+            EmptyState("No scans yet", "Start scanning tags to see your history here")
         } else {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                recentScans.take(3).forEach { scan ->
-                    ScanCard(
-                        scan = scan,
-                        onClick = onHistoryClick
-                    )
+                uiState.recentScans.forEach { scan ->
+                    ScanCard(scan = scan, onClick = onHistoryClick)
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun QuickStat(value: String, label: String) {
+    Column {
+        Text(value, color = Color(0xFF2563EB), fontWeight = FontWeight.Bold)
+        Text(label, color = Color(0xFF6B7280), style = MaterialTheme.typography.labelSmall)
     }
 }

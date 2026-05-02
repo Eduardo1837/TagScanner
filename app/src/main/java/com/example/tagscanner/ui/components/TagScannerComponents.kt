@@ -6,12 +6,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tagscanner.core.util.formatTimestamp
 import com.example.tagscanner.domain.model.InterpretationSeverity
@@ -123,6 +128,10 @@ fun ScanCard(
         ScanSource.LIVE_CAMERA -> "Live Camera"
         ScanSource.GALLERY_IMAGE -> "Gallery Image"
     }
+    val sourceIcon = when (scan.source) {
+        ScanSource.LIVE_CAMERA -> Icons.Filled.CameraAlt
+        ScanSource.GALLERY_IMAGE -> Icons.Filled.Image
+    }
 
     Card(
         modifier = modifier
@@ -151,11 +160,23 @@ fun ScanCard(
 
                 Spacer(Modifier.height(6.dp))
 
-                Text(
-                    text = "$sourceLabel • ${formatTimestamp(scan.timestampMillis)}",
-                    color = Color(0xFF6B7280),
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = sourceIcon,
+                        contentDescription = sourceLabel,
+                        tint = Color(0xFF6B7280),
+                        modifier = Modifier.size(16.dp)
+                    )
+
+                    Text(
+                        text = formatTimestamp(scan.timestampMillis),
+                        color = Color(0xFF6B7280),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
 
                 Spacer(Modifier.height(4.dp))
 
