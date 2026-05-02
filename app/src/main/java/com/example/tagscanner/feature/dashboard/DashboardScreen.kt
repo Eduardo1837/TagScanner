@@ -12,30 +12,28 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tagscanner.core.util.formatTimestamp
-import com.example.tagscanner.data.repository.FakeScanData
-import com.example.tagscanner.domain.model.InterpretationSeverity
 
 @Composable
-fun DashboardScreen() {
-    val scans = FakeScanData.scans
-    val latestScan = scans.maxByOrNull { it.timestampMillis }
+fun DashboardScreen(
+    viewModel: DashboardViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    val normalCount = scans.count {
-        it.interpretation.severity == InterpretationSeverity.NORMAL
-    }
+    DashboardContent(
+        uiState = uiState
+    )
+}
 
-    val warningCount = scans.count {
-        it.interpretation.severity == InterpretationSeverity.WARNING
-    }
-
-    val criticalCount = scans.count {
-        it.interpretation.severity == InterpretationSeverity.CRITICAL
-    }
-
+@Composable
+private fun DashboardContent(
+    uiState: DashboardUiState
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -49,7 +47,7 @@ fun DashboardScreen() {
 
         SummaryCard(
             title = "Total scans",
-            value = scans.size.toString()
+            value = uiState.totalScans.toString()
         )
 
         Row(
@@ -58,22 +56,24 @@ fun DashboardScreen() {
         ) {
             SmallSummaryCard(
                 title = "Normal",
-                value = normalCount.toString(),
+                value = uiState.normalCount.toString(),
                 modifier = Modifier.weight(1f)
             )
 
             SmallSummaryCard(
                 title = "Warning",
-                value = warningCount.toString(),
+                value = uiState.warningCount.toString(),
                 modifier = Modifier.weight(1f)
             )
 
             SmallSummaryCard(
                 title = "Critical",
-                value = criticalCount.toString(),
+                value = uiState.criticalCount.toString(),
                 modifier = Modifier.weight(1f)
             )
         }
+
+        val latestScan = uiState.latestScan
 
         if (latestScan != null) {
             Card(
@@ -105,6 +105,11 @@ fun DashboardScreen() {
                     )
                 }
             }
+        } else {
+            Text(
+                text = "No scan data available yet.",
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

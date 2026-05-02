@@ -13,16 +13,29 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tagscanner.core.util.formatTimestamp
-import com.example.tagscanner.data.repository.FakeScanData
 import com.example.tagscanner.domain.model.ScanResult
 
 @Composable
-fun HistoryScreen() {
-    val scans = FakeScanData.scans
+fun HistoryScreen(
+    viewModel: HistoryViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
+    HistoryContent(
+        uiState = uiState
+    )
+}
+
+@Composable
+private fun HistoryContent(
+    uiState: HistoryUiState
+) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -32,13 +45,21 @@ fun HistoryScreen() {
             modifier = Modifier.padding(16.dp)
         )
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(scans) { scan ->
-                ScanHistoryItem(scan = scan)
+        if (uiState.scans.isEmpty()) {
+            Text(
+                text = "No scans available yet.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(16.dp)
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(uiState.scans) { scan ->
+                    ScanHistoryItem(scan = scan)
+                }
             }
         }
     }
