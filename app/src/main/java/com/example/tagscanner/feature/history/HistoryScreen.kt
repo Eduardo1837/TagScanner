@@ -63,10 +63,16 @@ private fun HistoryContent(
                     scan.interpretation.severity == uiState.selectedFilter.severity
         }
         .filter { scan ->
-            uiState.searchQuery.isBlank() ||
-                    scan.interpretation.label.contains(uiState.searchQuery, ignoreCase = true) ||
-                    scan.interpretation.description.contains(uiState.searchQuery, ignoreCase = true) ||
-                    scan.note.orEmpty().contains(uiState.searchQuery, ignoreCase = true)
+            val query = uiState.searchQuery
+
+            query.isBlank() ||
+                    scan.interpretation.label.contains(query, ignoreCase = true) ||
+                    scan.interpretation.description.contains(query, ignoreCase = true) ||
+                    scan.details?.provider.orEmpty().contains(query, ignoreCase = true) ||
+                    scan.details?.product.orEmpty().contains(query, ignoreCase = true) ||
+                    scan.details?.batch.orEmpty().contains(query, ignoreCase = true) ||
+                    scan.details?.category.orEmpty().contains(query, ignoreCase = true) ||
+                    scan.note.orEmpty().contains(query, ignoreCase = true)
         }
 
     Column(
@@ -116,10 +122,10 @@ private fun HistoryContent(
         if(filteredScans.isEmpty()){
             EmptyState(
                 title = "No scans found",
-                description = if (uiState.selectedFilter == HistoryFilter.All) {
-                    "Scan tags to show them here"
+                description = if (uiState.selectedFilter == HistoryFilter.All && uiState.searchQuery.isBlank()) {
+                    "No scans saved yet."
                 } else {
-                    "No ${uiState.selectedFilter.label.lowercase()} scans in your history"
+                    "No scans match your filters"
                 }
             )
         } else {

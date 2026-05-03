@@ -22,6 +22,10 @@ import com.example.tagscanner.core.util.formatTimestamp
 import com.example.tagscanner.domain.model.InterpretationSeverity
 import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.domain.model.ScanSource
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.OutlinedButton
+import com.example.tagscanner.domain.model.ScanDetails
 
 private val AppBlue = Color(0xFF2563EB)
 private val PageBackground = Color(0xFFF9FAFB)
@@ -239,6 +243,96 @@ fun EmptyState(
         Text(title, fontWeight = FontWeight.Medium, color = Color(0xFF111827))
         Spacer(Modifier.height(4.dp))
         Text(description, color = Color(0xFF6B7280), style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Composable
+fun ActiveDetailsCompactCard(
+    details: ScanDetails,
+    onClearClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF6FF)),
+        border = CardDefaults.outlinedCardBorder(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Active Details",
+                    color = Color(0xFF111827),
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.labelMedium
+                )
+
+                Text(
+                    text = "Clear",
+                    color = Color(0xFF2563EB),
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.clickable(onClick = onClearClick)
+                )
+            }
+
+            Spacer(Modifier.height(4.dp))
+
+            Text(
+                text = "${details.provider} - ${details.product} - ${details.batch}",
+                color = Color(0xFF374151),
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
+}
+
+@Composable
+fun ScannerSaveActions(
+    activeDetails: ScanDetails?,
+    onSaveResultClick: () -> Unit,
+    onSaveWithCurrentClick: () -> Unit,
+    onSaveWithNewClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        if (activeDetails == null) {
+            Button(
+                onClick = onSaveResultClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp)
+            ) {
+                Text("Save result")
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Button(
+                    onClick = onSaveWithCurrentClick,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(54.dp)
+                ) {
+                    Text("Save with current")
+                }
+
+                OutlinedButton(
+                    onClick = onSaveWithNewClick,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(54.dp)
+                ) {
+                    Text("Save with new")
+                }
+            }
+        }
     }
 }
 

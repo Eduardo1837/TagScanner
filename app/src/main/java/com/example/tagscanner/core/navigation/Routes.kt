@@ -6,4 +6,5 @@ sealed class Route (val route: String){
     data object  GalleryScan: Route("gallery_scan")
     data object Dashboard: Route("dashboard")
     data object History: Route("history")
+    data object SaveScanDetails: Route("save_scan_details")
 }

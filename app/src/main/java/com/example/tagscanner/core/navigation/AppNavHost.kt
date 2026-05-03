@@ -17,6 +17,7 @@ import com.example.tagscanner.feature.gallery.GalleryScanScreen
 import com.example.tagscanner.feature.dashboard.DashboardScreen
 import com.example.tagscanner.feature.history.HistoryScreen
 import com.example.tagscanner.feature.home.HomeViewModel
+import com.example.tagscanner.feature.save.SaveScanDetailsScreen
 import com.example.tagscanner.ui.components.BottomNavBar
 
 @Composable
@@ -60,16 +61,25 @@ fun AppNavHost() {
                     onLiveScanClick = {navigateToTopLevelRoute(Route.LiveScan) },
                     onGalleryScanClick = { navigateToTopLevelRoute(Route.GalleryScan) },
                     onDashboardClick = { navigateToTopLevelRoute(Route.Dashboard) },
-                    onHistoryClick = { navigateToTopLevelRoute(Route.History) }
+                    onHistoryClick = { navigateToTopLevelRoute(Route.History) },
+                    onClearActiveDetails = homeViewModel::clearActiveDetails
                 )
             }
 
             composable(Route.LiveScan.route) {
-                LiveScanScreen()
+                LiveScanScreen(
+                    onSaveResultClick = {
+                        navController.navigate(Route.SaveScanDetails.route)
+                    }
+                )
             }
 
             composable(Route.GalleryScan.route) {
-                GalleryScanScreen()
+                GalleryScanScreen(
+                    onSaveResultClick = {
+                        navController.navigate(Route.SaveScanDetails.route)
+                    }
+                )
             }
 
             composable(Route.Dashboard.route) {
@@ -78,6 +88,17 @@ fun AppNavHost() {
 
             composable(Route.History.route) {
                 HistoryScreen()
+            }
+
+            composable(Route.SaveScanDetails.route) {
+                SaveScanDetailsScreen(
+                    onFinishSave = {
+                        navController.popBackStack()
+                    },
+                    onCancelClick = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

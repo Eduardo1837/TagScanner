@@ -31,6 +31,7 @@ fun HomeScreen(
     onGalleryScanClick: () -> Unit,
     onDashboardClick: () -> Unit,
     onHistoryClick: () -> Unit,
+    onClearActiveDetails: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -74,7 +75,10 @@ fun HomeScreen(
 
         uiState.activeDetails?.let { details ->
             Spacer(Modifier.height(16.dp))
-            ActiveDetailsPreview(details = details)
+            ActiveDetailsPreview(
+                details = details,
+                onClearClick = onClearActiveDetails
+            )
         }
 
         Spacer(Modifier.height(20.dp))
@@ -172,7 +176,8 @@ private fun HomeActionCard(
 
 @Composable
 private fun ActiveDetailsPreview(
-    details: ScanDetails
+    details: ScanDetails,
+    onClearClick: () -> Unit
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF6FF)),
@@ -181,12 +186,26 @@ private fun ActiveDetailsPreview(
         Column(
             modifier = Modifier.padding(14.dp)
         ) {
-            Text(
-                text = "Active Scan Details",
-                color = Color(0xFF111827),
-                fontWeight = FontWeight.Medium,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Active Scan Details",
+                    color = Color(0xFF111827),
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Text(
+                    text = "Clear",
+                    color = Color(0xFF2563EB),
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.clickable(onClick = onClearClick)
+                )
+            }
 
             Spacer(Modifier.height(8.dp))
 
