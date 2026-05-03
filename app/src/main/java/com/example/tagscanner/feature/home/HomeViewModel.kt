@@ -2,6 +2,7 @@ package com.example.tagscanner.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tagscanner.domain.model.InterpretationSeverity
 import com.example.tagscanner.domain.repository.FakeScanRepository
 import com.example.tagscanner.domain.repository.ScanRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,15 +24,24 @@ class HomeViewModel(
     private fun observeScans(){
         viewModelScope.launch {
             scanRepository.observeScans().collect { scans ->
-                val latestScan = scans.firstOrNull()
+                val qualityScores = scans.mapNotNull { it.qualityScore }
+
+                val providerAverages = scans
+                    .filter { it.details?.provider != null && it.qualityScore != null }
+                    .groupBy { it.details!!.provider }
+                    .mapValues { entry ->
+                        entry.value.mapNotNull { it.qualityScore }.average()
+                    }
 
                 _uiState.value = HomeUiState(
                     recentScans = scans.take(3),
                     totalScans = scans.size,
-                    latestResult = latestScan?.interpretation?.label,
-                    latestConfidence = latestScan?.colorMeasurement?.confidence
-                        ?.times(100)
-                        ?.toInt(),
+                    averageQuality = qualityScores.average().takeIf { !it.isNaN() }?.toInt() ?: 0,
+                    bestProvider = providerAverages.maxByOrNull { it.value }?.key,
+                    criticalScans = scans.count {
+                        it.interpretation.severity == InterpretationSeverity.CRITICAL
+                    },
+                    activeDetails = null,
                     isLoading = false
                 )
             }

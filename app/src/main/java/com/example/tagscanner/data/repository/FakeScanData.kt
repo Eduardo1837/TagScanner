@@ -3,6 +3,7 @@ package com.example.tagscanner.data.repository
 import com.example.tagscanner.domain.model.ColorInterpretation
 import com.example.tagscanner.domain.model.ColorMeasurement
 import com.example.tagscanner.domain.model.InterpretationSeverity
+import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.domain.model.ScanSource
 
@@ -28,6 +29,13 @@ object FakeScanData {
                 severity = InterpretationSeverity.NORMAL
             ),
             regionOfInterest = null,
+            details = ScanDetails(
+                provider = "FreshFarm Co.",
+                product = "Yogurt Pack A",
+                batch = "B-1024",
+                category = "Food"
+            ),
+            qualityScore = 96,
             note = "Sample gallery scan"
         ),
         ScanResult(
@@ -49,6 +57,13 @@ object FakeScanData {
                 severity = InterpretationSeverity.WARNING
             ),
             regionOfInterest = null,
+            details = ScanDetails(
+                provider = "MediSupply Ltd.",
+                product = "Vaccine Box B",
+                batch = "LOT-88A",
+                category = "Medical"
+            ),
+            qualityScore = 62,
             note = "Sample live scan"
         ),
         ScanResult(
@@ -70,6 +85,13 @@ object FakeScanData {
                 severity = InterpretationSeverity.CRITICAL
             ),
             regionOfInterest = null,
+            details = ScanDetails(
+                provider = "SafePack Distribution",
+                product = "Fresh Meat Tray",
+                batch = "M-2045",
+                category = "Food"
+            ),
+            qualityScore = 24,
             note = "Sample critical scan"
         ),
         ScanResult(
@@ -91,6 +113,13 @@ object FakeScanData {
                 severity = InterpretationSeverity.UNKNOWN
             ),
             regionOfInterest = null,
+            details = ScanDetails(
+                provider = "SafePack Distribution",
+                product = "Fresh Meat Tray",
+                batch = "M-2045",
+                category = "Food"
+            ),
+            qualityScore = 24,
             note = "Sample unknown scan"
         )
     )

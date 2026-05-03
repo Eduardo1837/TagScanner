@@ -124,14 +124,27 @@ fun ScanCard(
 ) {
     val measurement = scan.colorMeasurement
     val swatch = Color(measurement.red, measurement.green, measurement.blue)
+    val details = scan.details
+
     val sourceLabel = when (scan.source) {
         ScanSource.LIVE_CAMERA -> "Live Camera"
         ScanSource.GALLERY_IMAGE -> "Gallery Image"
     }
+
     val sourceIcon = when (scan.source) {
         ScanSource.LIVE_CAMERA -> Icons.Filled.CameraAlt
         ScanSource.GALLERY_IMAGE -> Icons.Filled.Image
     }
+
+    val title = details?.provider ?: scan.interpretation.label
+    val subtitle = if (details != null) {
+        "${details.product} • ${details.batch}"
+    } else {
+        scan.interpretation.description
+    }
+
+    val qualityText = scan.qualityScore?.let { "$it%" }
+        ?: "${(measurement.confidence * 100).toInt()}%"
 
     Card(
         modifier = modifier
@@ -142,49 +155,62 @@ fun ScanCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             ColorSwatch(color = swatch)
 
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = scan.interpretation.label,
-                        modifier = Modifier.weight(1f),
-                        color = Color(0xFF111827),
-                        fontWeight = FontWeight.Medium
-                    )
+                Row(
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = title,
+                            color = Color(0xFF111827),
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Spacer(Modifier.height(2.dp))
+
+                        Text(
+                            text = subtitle,
+                            color = Color(0xFF6B7280),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+
                     StatusBadge(scan.interpretation.severity)
                 }
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = "Quality: $qualityText • Confidence: ${(measurement.confidence * 100).toInt()}%",
+                    color = Color(0xFF6B7280),
+                    style = MaterialTheme.typography.labelSmall
+                )
 
                 Spacer(Modifier.height(6.dp))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     Icon(
                         imageVector = sourceIcon,
                         contentDescription = sourceLabel,
                         tint = Color(0xFF6B7280),
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(14.dp)
                     )
 
                     Text(
                         text = formatTimestamp(scan.timestampMillis),
                         color = Color(0xFF6B7280),
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.labelSmall
                     )
                 }
-
-                Spacer(Modifier.height(4.dp))
-
-                Text(
-                    text = "Confidence: ${(measurement.confidence * 100).toInt()}%",
-                    color = Color(0xFF6B7280),
-                    style = MaterialTheme.typography.labelSmall
-                )
             }
         }
     }
