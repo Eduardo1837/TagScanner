@@ -1,16 +1,12 @@
 package com.example.tagscanner.core.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -29,18 +25,22 @@ fun AppNavHost() {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
+    fun navigateToTopLevelRoute(route: Route){
+        navController.navigate(route.route){
+            launchSingleTop = true
+            restoreState = true
+            popUpTo(Route.Home.route){
+                saveState = true
+            }
+        }
+    }
+
     Scaffold(
         bottomBar = {
             BottomNavBar(
                 currentRoute = currentRoute,
                 onItemClick = { route ->
-                    navController.navigate(route.route){
-                        launchSingleTop = true
-                        restoreState = true
-                        popUpTo(Route.Home.route){
-                            saveState = true
-                        }
-                    }
+                    navigateToTopLevelRoute(route)
                 }
             )
         }
@@ -57,10 +57,10 @@ fun AppNavHost() {
 
                 HomeScreen(
                    uiState = uiState,
-                    onLiveScanClick = {navController.navigate(Route.LiveScan.route) },
-                    onGalleryScanClick = { navController.navigate(Route.GalleryScan.route) },
-                    onDashboardClick = { navController.navigate(Route.Dashboard.route) },
-                    onHistoryClick = { navController.navigate(Route.History.route) }
+                    onLiveScanClick = {navigateToTopLevelRoute(Route.LiveScan) },
+                    onGalleryScanClick = { navigateToTopLevelRoute(Route.GalleryScan) },
+                    onDashboardClick = { navigateToTopLevelRoute(Route.Dashboard) },
+                    onHistoryClick = { navigateToTopLevelRoute(Route.History) }
                 )
             }
 
