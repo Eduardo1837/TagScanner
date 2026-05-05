@@ -30,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tagscanner.domain.model.AnalysisResult
 import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.repository.ActiveScanDetailsRepository
+import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.ui.components.ActiveDetailsCompactCard
 import com.example.tagscanner.ui.components.ScannerSaveActions
 import com.example.tagscanner.ui.components.screenBackground
@@ -67,11 +68,21 @@ fun GalleryScanScreen(
             )
         },
         onClearDetailsClick = ActiveScanDetailsRepository::clearActiveDetails,
-        onSaveResultClick = onSaveResultClick,
+        onSaveResultClick = {
+            uiState.analysisResult?.let { result ->
+                PendingScanResultRepository.setPendingResult(result)
+                onSaveResultClick()
+            }
+        },
         onSaveWithCurrentClick = {
             // Later: save scan immediately with active details.
         },
-        onSaveWithNewClick = onSaveResultClick
+        onSaveWithNewClick = {
+            uiState.analysisResult?.let { result ->
+                PendingScanResultRepository.setPendingResult(result)
+                onSaveResultClick()
+            }
+        }
     )
 }
 

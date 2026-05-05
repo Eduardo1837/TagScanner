@@ -22,7 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tagscanner.domain.model.InterpretationSeverity
 import com.example.tagscanner.domain.repository.ActiveScanDetailsRepository
+import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.ui.components.ColorSwatch
 import com.example.tagscanner.ui.components.ReuseDetailsDialog
 import com.example.tagscanner.ui.components.screenBackground
@@ -44,7 +46,10 @@ fun SaveScanDetailsScreen(
         onNoteChanged = viewModel::onNoteChanged,
         onSuggestionClick = viewModel::applyProviderSuggestion,
         onSaveClick = viewModel::onSaveScanClicked,
-        onCancelClick = onCancelClick
+        onCancelClick = {
+            PendingScanResultRepository.clearPendingResult()
+            onCancelClick()
+        }
     )
 
     uiState.pendingReuseDetails?.let { details ->
@@ -52,10 +57,12 @@ fun SaveScanDetailsScreen(
             details = details,
             onConfirmReuse = {
                 ActiveScanDetailsRepository.setActiveDetails(details)
+                PendingScanResultRepository.clearPendingResult()
                 viewModel.clearPendingReuseDetails()
                 onFinishSave()
             },
             onDismissReuse = {
+                PendingScanResultRepository.clearPendingResult()
                 viewModel.clearPendingReuseDetails()
                 onFinishSave()
             }
@@ -194,8 +201,18 @@ private fun ScanResultPreview(
         Color(0xFF2AB455)
     }
 
-    val status = interpretation?.label ?: "Green / Normal"
-    val quality = "96%"
+    val status = if (interpretation != null){
+        "${interpretation.label} / ${interpretation.severity.name.lowercase().replaceFirstChar { it.uppercase() }}"
+    } else {
+        "No scan result"
+    }
+    val quality = when (interpretation?.severity) {
+        InterpretationSeverity.NORMAL -> "96%"
+        InterpretationSeverity.WARNING -> "62%"
+        InterpretationSeverity.CRITICAL -> "24%"
+        InterpretationSeverity.UNKNOWN ->"0%"
+        null -> "-"
+    }
     val confidence = measurement?.confidence
         ?.times(100)
         ?.toInt()

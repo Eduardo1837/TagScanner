@@ -38,12 +38,14 @@ fun AppNavHost() {
 
     Scaffold(
         bottomBar = {
-            BottomNavBar(
-                currentRoute = currentRoute,
-                onItemClick = { route ->
-                    navigateToTopLevelRoute(route)
-                }
-            )
+            if(currentRoute != Route.SaveScanDetails.route) {
+                BottomNavBar(
+                    currentRoute = currentRoute,
+                    onItemClick = { route ->
+                        navigateToTopLevelRoute(route)
+                    }
+                )
+            }
         }
     ) { innerPadding ->
         NavHost(
