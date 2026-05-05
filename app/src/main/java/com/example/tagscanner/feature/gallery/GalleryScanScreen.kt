@@ -15,6 +15,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,6 +35,9 @@ import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.ui.components.ActiveDetailsCompactCard
 import com.example.tagscanner.ui.components.ScannerSaveActions
 import com.example.tagscanner.ui.components.screenBackground
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import com.example.tagscanner.core.util.qualityScoreFor
 
 @Composable
 fun GalleryScanScreen(
@@ -116,16 +120,12 @@ private fun GalleryScanContent(
             if (!hasImage) {
                 EmptyImageState()
             } else {
-                SelectedImagePlaceholder()
-
-                RoiFrame(
-                    modifier = Modifier.align(Alignment.Center)
+                SelectedImagePreview(
+                    imageUri = uiState.selectedImageUri,
+                    modifier = Modifier.fillMaxSize()
                 )
 
-                Text(
-                    text = "Selected Image",
-                    color = Color(0xFF4B5563),
-                    style = MaterialTheme.typography.bodySmall,
+                RoiFrame(
                     modifier = Modifier.align(Alignment.Center)
                 )
 
@@ -211,11 +211,15 @@ private fun EmptyImageState() {
 }
 
 @Composable
-private fun SelectedImagePlaceholder() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFD1D5DB))
+private fun SelectedImagePreview(
+    imageUri: android.net.Uri?,
+    modifier: Modifier = Modifier
+) {
+    AsyncImage(
+        model = imageUri,
+        contentDescription = "Selected image",
+        modifier = modifier,
+        contentScale = ContentScale.Crop
     )
 }
 
@@ -241,6 +245,7 @@ private fun GalleryResultOverlay(
 ) {
     val measurement = result.colorMeasurement
     val swatch = Color(measurement.red, measurement.green, measurement.blue)
+    val quality = qualityScoreFor(result)
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -275,7 +280,7 @@ private fun GalleryResultOverlay(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text(
-                        text = "Quality: 62%",
+                        text = "Quality: $quality%",
                         color = Color(0xFF6B7280),
                         style = MaterialTheme.typography.labelSmall
                     )
@@ -343,6 +348,17 @@ private fun GalleryBottomActions(
 
                 Spacer(Modifier.height(10.dp))
             }
+
+            OutlinedButton(
+                onClick = onPickImageClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+            ) {
+                Text("Choose another photo")
+            }
+
+            Spacer(Modifier.height(10.dp))
 
             ScannerSaveActions(
                 activeDetails = activeDetails,

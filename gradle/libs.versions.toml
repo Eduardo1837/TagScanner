@@ -12,6 +12,7 @@ lifecycleViewmodelCompose = "2.10.0"
 navigationCompose = "2.9.8"
 foundationLayout = "1.11.0"
 camerax = "1.6.0"
+coil = "2.7.0"
 
 [libraries]
 activity-compose = { module = "androidx.activity:activity-compose" }
@@ -37,6 +38,7 @@ androidx-camera-core = { group = "androidx.camera", name = "camera-core", versio
 androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

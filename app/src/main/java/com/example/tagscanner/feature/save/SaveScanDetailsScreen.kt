@@ -3,6 +3,7 @@ package com.example.tagscanner.feature.save
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -22,7 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.tagscanner.domain.model.InterpretationSeverity
+import com.example.tagscanner.core.util.qualityScoreFor
 import com.example.tagscanner.domain.repository.ActiveScanDetailsRepository
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.ui.components.ColorSwatch
@@ -155,11 +156,12 @@ private fun SaveScanDetailsContent(
 
         Spacer(Modifier.height(8.dp))
 
-        Row(
+        FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            uiState.providerSuggestions.take(2).forEach { suggestion ->
+            uiState.providerSuggestions.forEach { suggestion ->
                 SuggestionChip(
                     text = suggestion,
                     onClick = { onSuggestionClick(suggestion) }
@@ -206,13 +208,9 @@ private fun ScanResultPreview(
     } else {
         "No scan result"
     }
-    val quality = when (interpretation?.severity) {
-        InterpretationSeverity.NORMAL -> "96%"
-        InterpretationSeverity.WARNING -> "62%"
-        InterpretationSeverity.CRITICAL -> "24%"
-        InterpretationSeverity.UNKNOWN ->"0%"
-        null -> "-"
-    }
+    val quality = uiState.scanResult
+        ?.let { "${qualityScoreFor(it)}%" }
+        ?: "-"
     val confidence = measurement?.confidence
         ?.times(100)
         ?.toInt()
