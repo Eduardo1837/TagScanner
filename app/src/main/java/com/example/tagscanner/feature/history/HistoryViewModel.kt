@@ -36,4 +36,16 @@ class HistoryViewModel(
             }
         }
     }
+
+    fun onProviderSelected(provider: String?) {
+        _uiState.value = _uiState.value.copy(selectedProvider = provider)
+    }
+
+    fun onProductSelected(product: String?) {
+        _uiState.value = _uiState.value.copy(selectedProduct = product)
+    }
+
+    fun onBatchSelected(batch: String?) {
+        _uiState.value = _uiState.value.copy(selectedBatch = batch)
+    }
 }

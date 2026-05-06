@@ -15,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,9 +26,14 @@ import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.ui.components.EmptyState
 import com.example.tagscanner.ui.components.ScanCard
 import com.example.tagscanner.ui.components.screenBackground
+import java.util.logging.Filter
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 @Composable
 fun HistoryScreen(
+    onScanClick: (ScanResult) -> Unit,
     viewModel: HistoryViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -36,9 +42,10 @@ fun HistoryScreen(
         uiState = uiState,
         onFilterSelected = viewModel::onFilterSelected,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
-        onScanClick = {
-            //TODO
-        }
+        onProviderSelected = viewModel::onProviderSelected,
+        onProductSelected = viewModel::onProductSelected,
+        onBatchSelected = viewModel::onBatchSelected,
+        onScanClick = onScanClick
     )
 }
 
@@ -47,6 +54,9 @@ private fun HistoryContent(
     uiState: HistoryUiState,
     onFilterSelected: (HistoryFilter) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
+    onProviderSelected: (String?) -> Unit,
+    onProductSelected: (String?) -> Unit,
+    onBatchSelected: (String?) -> Unit,
     onScanClick: (ScanResult) -> Unit
 ) {
     val filters = listOf(
@@ -57,10 +67,41 @@ private fun HistoryContent(
         HistoryFilter.Unknown
     )
 
+    val providers = uiState.scans
+        .mapNotNull { it.details?.provider }
+        .distinct()
+        .sorted()
+
+    val products = uiState.scans
+        .mapNotNull { it.details?.product }
+        .distinct()
+        .sorted()
+
+    val batches = uiState.scans
+        .mapNotNull { it.details?.batch }
+        .distinct()
+        .sorted()
+
+    var showAdvancedFilters by remember {
+        mutableStateOf(false)
+    }
+
     val filteredScans = uiState.scans
         .filter { scan ->
             uiState.selectedFilter.severity == null ||
                     scan.interpretation.severity == uiState.selectedFilter.severity
+        }
+        .filter { scan ->
+            uiState.selectedProvider == null ||
+                    scan.details?.provider == uiState.selectedProvider
+        }
+        .filter { scan ->
+            uiState.selectedProduct == null ||
+                    scan.details?.product == uiState.selectedProduct
+        }
+        .filter { scan ->
+            uiState.selectedBatch == null ||
+                    scan.details?.batch == uiState.selectedBatch
         }
         .filter { scan ->
             val query = uiState.searchQuery
@@ -97,9 +138,21 @@ private fun HistoryContent(
         ) {
             Icon(
                 imageVector = Icons.Filled.FilterList,
-                contentDescription = "Filter",
-                tint = Color(0xFF6B7280),
-                modifier = Modifier.size(22.dp)
+                contentDescription = if (showAdvancedFilters) {
+                    "Hide Filters"
+                } else {
+                    "Show Filters"
+                },
+                tint = if (showAdvancedFilters) {
+                    Color(0xFF2563EB)
+                } else {
+                    Color(0xFF6B7280)
+                },
+                modifier = Modifier
+                    .size(22.dp)
+                    .clickable {
+                        showAdvancedFilters = !showAdvancedFilters
+                    }
             )
 
             filters.forEach {filter ->
@@ -115,6 +168,36 @@ private fun HistoryContent(
                     onClick = { onFilterSelected(filter) }
                 )
             }
+        }
+
+        if(showAdvancedFilters) {
+
+            Spacer(Modifier.height(8.dp))
+
+            DynamicFilterRow(
+                title = "Provider",
+                values = providers,
+                selectedValue = uiState.selectedProvider,
+                onSelected = onProviderSelected
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            DynamicFilterRow(
+                title = "Product",
+                values = products,
+                selectedValue = uiState.selectedProduct,
+                onSelected = onProductSelected
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            DynamicFilterRow(
+                title = "Batch",
+                values = batches,
+                selectedValue = uiState.selectedBatch,
+                onSelected = onBatchSelected
+            )
         }
 
         Spacer(Modifier.height(12.dp))
@@ -197,6 +280,46 @@ private fun FilterChip(
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Medium
         )
+    }
+}
+
+@Composable
+private fun DynamicFilterRow(
+    title: String,
+    values: List<String>,
+    selectedValue: String?,
+    onSelected: (String?) -> Unit
+) {
+    if (values.isEmpty()) return
+
+    Column {
+        Text(
+            text = title,
+            color = Color(0xFF6B7280),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(Modifier.height(6.dp))
+
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                label = "All",
+                selected = selectedValue == null,
+                onClick = {onSelected(null)}
+            )
+
+            values.forEach { value ->
+                FilterChip(
+                    label = value,
+                    selected = selectedValue == value,
+                    onClick = { onSelected(value)}
+                )
+            }
+        }
     }
 }
 

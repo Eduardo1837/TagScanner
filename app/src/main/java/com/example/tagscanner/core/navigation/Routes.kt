@@ -7,4 +7,9 @@ sealed class Route (val route: String){
     data object Dashboard: Route("dashboard")
     data object History: Route("history")
     data object SaveScanDetails: Route("save_scan_details")
+    data object ScanDetails : Route("scan_details/{scanId}") {
+        fun createRoute(scanId: Long): String {
+            return "scan_details/$scanId"
+        }
+    }
 }

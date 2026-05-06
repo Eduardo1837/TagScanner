@@ -7,6 +7,9 @@ data class HistoryUiState(
     val scans: List<ScanResult> = emptyList(),
     val selectedFilter: HistoryFilter = HistoryFilter.All,
     val searchQuery: String = "",
+    val selectedProvider: String? = null,
+    val selectedProduct: String? = null,
+    val selectedBatch: String? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

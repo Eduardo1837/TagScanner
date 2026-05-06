@@ -1,6 +1,8 @@
 package com.example.tagscanner.feature.dashboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,12 +41,19 @@ fun DashboardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    DashboardContent(uiState = uiState)
+    DashboardContent(
+        uiState = uiState,
+        onTimeRangeSelected = viewModel::onTimeRangeSelected,
+        onProviderSelected = viewModel::onProviderSelected,
+        onProductOrCategorySelected = viewModel::onProductOrCategorySelected)
 }
 
 @Composable
 private fun DashboardContent(
-    uiState: DashboardUiState
+    uiState: DashboardUiState,
+    onTimeRangeSelected: (DashboardTimeRange) -> Unit,
+    onProviderSelected: (String?) -> Unit,
+    onProductOrCategorySelected: (String?) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -58,6 +67,15 @@ private fun DashboardContent(
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF111827)
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        DashboardFilters(
+            uiState = uiState,
+            onTimeRangeSelected = onTimeRangeSelected,
+            onProviderSelected = onProviderSelected,
+            onProductOrCategorySelected = onProductOrCategorySelected
         )
 
         Spacer(Modifier.height(16.dp))
@@ -572,6 +590,123 @@ private fun BatchRow(
             color = Color(0xFF111827),
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.titleMedium
+        )
+    }
+}
+
+@Composable
+private fun DashboardFilters(
+    uiState: DashboardUiState,
+    onTimeRangeSelected: (DashboardTimeRange) -> Unit,
+    onProviderSelected: (String?) -> Unit,
+    onProductOrCategorySelected: (String?) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        FilterChipRow(
+            values = DashboardTimeRange.entries.toList(),
+            selectedValue = uiState.selectedTimeRange,
+            labelFor = { it.label },
+            onSelected = onTimeRangeSelected
+        )
+
+        FilterStringRow(
+            title = "Provider",
+            values = uiState.availableProviders,
+            selectedValue = uiState.selectedProvider,
+            onSelected = onProviderSelected
+        )
+
+        FilterStringRow(
+            title = "Product / Category",
+            values = uiState.availableProductsOrCategories,
+            selectedValue = uiState.selectedProductOrCategory,
+            onSelected = onProductOrCategorySelected
+        )
+    }
+}
+
+@Composable
+private fun <T> FilterChipRow(
+    values: List<T>,
+    selectedValue: T,
+    labelFor: (T) -> String,
+    onSelected: (T) -> Unit
+) {
+    Row(
+        modifier = Modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        values.forEach { value ->
+            SmallFilterChip(
+                label = labelFor(value),
+                selected = value == selectedValue,
+                onClick = { onSelected(value) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun FilterStringRow(
+    title: String,
+    values: List<String>,
+    selectedValue: String?,
+    onSelected: (String?) -> Unit
+) {
+    if (values.isEmpty()) return
+
+    Column {
+        Text(
+            text = title,
+            color = Color(0xFF6B7280),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(Modifier.height(6.dp))
+
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            SmallFilterChip(
+                label = "All",
+                selected = selectedValue == null,
+                onClick = { onSelected(null) }
+            )
+
+            values.forEach { value ->
+                SmallFilterChip(
+                    label = value,
+                    selected = selectedValue == value,
+                    onClick = { onSelected(value) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmallFilterChip(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val background = if (selected) Color(0xFF2563EB) else Color(0xFFF3F4F6)
+    val foreground = if (selected) Color.White else Color(0xFF374151)
+
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(99.dp))
+            .background(background)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        Text(
+            text = label,
+            color = foreground,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium
         )
     }
 }

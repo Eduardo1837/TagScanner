@@ -1,7 +1,17 @@
 package com.example.tagscanner.feature.dashboard
 
 import com.example.tagscanner.domain.model.ScanResult
+import java.security.Provider
 
+
+enum class DashboardTimeRange(
+    val label: String
+) {
+    TODAY("Today"),
+    LAST_7_DAYS("Last 7 days"),
+    LAST_30_DAYS("Last 30 days"),
+    ALL_TIME("All time")
+}
 data class DashboardUiState(
     val totalScans: Int = 0,
     val normalCount: Int = 0,
@@ -13,6 +23,11 @@ data class DashboardUiState(
     val latestScan: ScanResult? = null,
     val providerStats: List<ProviderStats> = emptyList(),
     val batchStats: List<BatchStats> = emptyList(),
+    val selectedTimeRange: DashboardTimeRange = DashboardTimeRange.ALL_TIME,
+    val selectedProvider: String? = null,
+    val selectedProductOrCategory: String? = null,
+    val availableProviders: List<String> = emptyList(),
+    val availableProductsOrCategories: List<String> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

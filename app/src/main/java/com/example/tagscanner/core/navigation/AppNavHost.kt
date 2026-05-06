@@ -7,14 +7,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.tagscanner.feature.home.HomeScreen
 import com.example.tagscanner.feature.live.LiveScanScreen
 import com.example.tagscanner.feature.gallery.GalleryScanScreen
 import com.example.tagscanner.feature.dashboard.DashboardScreen
+import com.example.tagscanner.feature.details.ScanDetailsScreen
 import com.example.tagscanner.feature.history.HistoryScreen
 import com.example.tagscanner.feature.home.HomeViewModel
 import com.example.tagscanner.feature.save.SaveScanDetailsScreen
@@ -89,7 +92,11 @@ fun AppNavHost() {
             }
 
             composable(Route.History.route) {
-                HistoryScreen()
+                HistoryScreen(
+                    onScanClick = {scan ->
+                        navController.navigate(Route.ScanDetails.createRoute(scan.id))
+                    }
+                )
             }
 
             composable(Route.SaveScanDetails.route) {
@@ -98,6 +105,24 @@ fun AppNavHost() {
                         navController.popBackStack()
                     },
                     onCancelClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(
+                route = Route.ScanDetails.route,
+                arguments = listOf(
+                    navArgument("scanId") {
+                        type = NavType.LongType
+                    }
+                )
+            ) { backStackEntry ->
+                val scanId = backStackEntry.arguments?.getLong("scanId") ?: return@composable
+
+                ScanDetailsScreen(
+                    scanId = scanId,
+                    onBackClick = {
                         navController.popBackStack()
                     }
                 )
