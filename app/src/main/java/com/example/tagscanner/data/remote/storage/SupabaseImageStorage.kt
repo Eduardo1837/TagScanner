@@ -19,6 +19,10 @@ class SupabaseImageStorage {
         return path
     }
 
+    suspend fun deleteScanPreview(path: String) {
+        bucket.delete(path)
+    }
+
     fun publicUrl(path: String): String{
         return bucket.publicUrl(path)
     }

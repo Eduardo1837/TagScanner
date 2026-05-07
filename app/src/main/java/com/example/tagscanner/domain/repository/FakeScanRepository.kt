@@ -24,4 +24,8 @@ class FakeScanRepository : ScanRepository {
         val updatedScans = listOf(scanResult) + scans.value
         scans.value = updatedScans
     }
+
+    override suspend fun deleteScan(scan: ScanResult) {
+        scans.value = scans.value.filterNot { it.id == scan.id }
+    }
 }

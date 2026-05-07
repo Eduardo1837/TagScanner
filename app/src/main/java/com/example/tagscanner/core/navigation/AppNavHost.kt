@@ -3,6 +3,7 @@ package com.example.tagscanner.core.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -60,6 +61,10 @@ fun AppNavHost() {
 
                 val homeViewModel: HomeViewModel = viewModel()
                 val uiState by homeViewModel.uiState.collectAsState()
+
+                LaunchedEffect(Unit) {
+                    homeViewModel.refreshScans()
+                }
 
                 HomeScreen(
                    uiState = uiState,

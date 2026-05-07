@@ -110,7 +110,11 @@ class SaveScanDetailsViewModel(
                 pendingScan = scan
 
                 _uiState.value = _uiState.value.copy(
-                    scanResult = scan?.result
+                    scanResult = scan?.result,
+                    provider = scan?.initialDetails?.provider.orEmpty(),
+                    product = scan?.initialDetails?.product.orEmpty(),
+                    batch = scan?.initialDetails?.batch.orEmpty(),
+                    category = scan?.initialDetails?.category.orEmpty()
                 )
             }
         }

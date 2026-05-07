@@ -10,4 +10,6 @@ interface ScanRepository {
     suspend fun getScanById(id: String): ScanResult?
 
     suspend fun saveScan(scanResult: ScanResult)
+
+    suspend fun deleteScan(scan: ScanResult)
 }

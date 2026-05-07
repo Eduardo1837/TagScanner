@@ -11,19 +11,24 @@ import com.example.tagscanner.data.remote.dto.ProviderInsertDto
 import com.example.tagscanner.data.remote.dto.ScanHistoryDto
 import com.example.tagscanner.data.maper.toDomain
 import com.example.tagscanner.data.maper.toScanInsertDto
+import com.example.tagscanner.data.remote.storage.SupabaseImageStorage
 import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.domain.repository.ScanRepository
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class SupabaseScanRepository : ScanRepository {
     private val client = SupabaseClientProvider.client
+    private val imageStorage = SupabaseImageStorage()
 
     override fun observeScans() : Flow<List<ScanResult>> = flow {
         val rows = client
             .from("scan_history_view")
-            .select()
+            .select{
+                order("scanned_at", Order.DESCENDING)
+            }
             .decodeList<ScanHistoryDto>()
 
         emit(rows.map { it.toDomain() })
@@ -59,6 +64,20 @@ class SupabaseScanRepository : ScanRepository {
         client
             .from("scans")
             .insert(scanResult.toScanInsertDto(batch.id))
+    }
+
+    override suspend fun deleteScan(scan: ScanResult) {
+        scan.imagePath?.let { path ->
+            imageStorage.deleteScanPreview(path)
+        }
+
+        client
+            .from("scans")
+            .delete {
+                filter {
+                    eq("id", scan.id)
+                }
+            }
     }
 }
 

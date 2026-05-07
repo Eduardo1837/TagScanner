@@ -28,4 +28,29 @@ class ScanDetailsViewModel(
             )
         }
     }
+
+    fun deleteCurrentScan() {
+        val scan = _uiState.value.scan ?: return
+
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isDeleting = true,
+                    errorMessage = null
+                )
+
+                scanRepository.deleteScan(scan)
+
+                _uiState.value = _uiState.value.copy(
+                    isDeleting = false,
+                    deleteCompleted = true
+                )
+            } catch (exception: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isDeleting = false,
+                    errorMessage = exception.message ?: "Could not delete scan"
+                )
+            }
+        }
+    }
 }

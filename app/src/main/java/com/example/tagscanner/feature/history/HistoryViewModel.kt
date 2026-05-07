@@ -19,7 +19,7 @@ class HistoryViewModel(
     val uiState: StateFlow<HistoryUiState> = _uiState.asStateFlow()
 
     init {
-        observeScans()
+        refreshScans()
     }
 
     fun onFilterSelected(filter: HistoryFilter) {
@@ -30,7 +30,7 @@ class HistoryViewModel(
         _uiState.value = _uiState.value.copy(searchQuery = query)
     }
 
-    private fun observeScans() {
+    fun refreshScans() {
         viewModelScope.launch {
             scanRepository.observeScans().collect { scans ->
                 _uiState.value = _uiState.value.copy(scans = scans)

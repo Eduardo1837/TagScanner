@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.tagscanner.domain.analyzer.ColorAnalyzer
 import com.example.tagscanner.domain.analyzer.ColorAnalyzerImpl
 import com.example.tagscanner.domain.model.PendingScan
+import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.model.ScanSource
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.processing.image.BitmapLoader
@@ -72,6 +73,7 @@ class GalleryScanViewModel(
 
     fun preparePendingScan(
         context: Context,
+        initialDetails: ScanDetails? = null,
         onReady: () -> Unit
     ) {
         val state = _uiState.value
@@ -92,7 +94,8 @@ class GalleryScanViewModel(
                 PendingScan(
                     result = result,
                     source = ScanSource.GALLERY_IMAGE,
-                    previewJpegBytes = previewBytes
+                    previewJpegBytes = previewBytes,
+                    initialDetails = initialDetails
                 )
             )
 

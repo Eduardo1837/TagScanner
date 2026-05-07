@@ -4,30 +4,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tagscanner.data.repository.SupabaseScanRepository
 import com.example.tagscanner.domain.model.InterpretationSeverity
+import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.repository.ActiveScanDetailsRepository
 import com.example.tagscanner.domain.repository.FakeScanRepository
+import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.domain.repository.ScanRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private var latestScans = emptyList<com.example.tagscanner.domain.model.ScanResult>()
-private var latestActiveDetails: com.example.tagscanner.domain.model.ScanDetails? = null
+
 class HomeViewModel(
     private val scanRepository: ScanRepository = SupabaseScanRepository(),
-    private val activeScanDetailsRepository: ActiveScanDetailsRepository = ActiveScanDetailsRepository
+    private val activeScanDetailsRepository: ActiveScanDetailsRepository = ActiveScanDetailsRepository,
+    private var latestScans: List<ScanResult> = emptyList<ScanResult>(),
+    private var latestActiveDetails: ScanDetails? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
-        observeScans()
+        refreshScans()
         observeActiveDetails()
     }
 
-    private fun observeScans() {
+    fun refreshScans() {
         viewModelScope.launch {
             scanRepository.observeScans().collect { scans ->
                 latestScans = scans

@@ -29,10 +29,10 @@ class DashboardViewModel(
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
     init {
-        observeDashboard()
+        refreshDashboard()
     }
 
-    private fun observeDashboard() {
+    fun refreshDashboard() {
         viewModelScope.launch {
             scanRepository.observeScans().collect { scans ->
                 allScans = scans

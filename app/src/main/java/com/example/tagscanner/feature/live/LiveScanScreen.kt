@@ -149,7 +149,11 @@ fun LiveScanScreen(
                 }
             },
             onSaveWithCurrentClick = {
-                // Later: save scan immediately with active details.
+               viewModel.preparePendingScan(
+                   previewBitmap = previewView.bitmap,
+                   initialDetails = activeDetails,
+                   onReady = onSaveResultClick
+               )
             },
             onSaveWithNewClick = {
                 uiState.currentResult?.let { result ->

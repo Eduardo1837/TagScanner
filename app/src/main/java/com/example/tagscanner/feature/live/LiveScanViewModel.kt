@@ -9,6 +9,7 @@ import com.example.tagscanner.domain.analyzer.ColorAnalyzerImpl
 import com.example.tagscanner.domain.model.PendingScan
 import com.example.tagscanner.domain.model.RegionOfInterest
 import com.example.tagscanner.domain.model.RgbColor
+import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.model.ScanSource
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.processing.image.PreviewImageEncoder
@@ -152,6 +153,7 @@ class LiveScanViewModel(
 
     fun preparePendingScan(
         previewBitmap: Bitmap?,
+        initialDetails: ScanDetails? = null,
         onReady: () -> Unit
     ) {
         val result = _uiState.value.currentResult ?: return
@@ -167,6 +169,7 @@ class LiveScanViewModel(
                 PendingScan(
                     result = result,
                     source = ScanSource.LIVE_CAMERA,
+                    initialDetails = initialDetails,
                     previewJpegBytes = previewBytes
                 )
             )

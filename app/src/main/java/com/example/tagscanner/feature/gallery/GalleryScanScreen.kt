@@ -81,7 +81,11 @@ fun GalleryScanScreen(
             }
         },
         onSaveWithCurrentClick = {
-            // Later: save scan immediately with active details.
+            viewModel.preparePendingScan(
+                context = context,
+                initialDetails = activeDetails,
+                onReady = onSaveResultClick
+            )
         },
         onSaveWithNewClick = {
             uiState.analysisResult?.let { result ->

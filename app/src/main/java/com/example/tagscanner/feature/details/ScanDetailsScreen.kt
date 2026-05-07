@@ -55,6 +55,12 @@ fun ScanDetailsScreen(
 
     val scan = uiState.scan
 
+    LaunchedEffect(uiState.deleteCompleted) {
+        if(uiState.deleteCompleted){
+            onBackClick()
+        }
+    }
+
     if(scan == null) {
         EmptyState(
             title = "Scan not found",
@@ -63,7 +69,9 @@ fun ScanDetailsScreen(
     } else {
         ScanDetailsContent(
             scan = scan,
-            onBackClick = onBackClick
+            onBackClick = onBackClick,
+            isDeleting = uiState.isDeleting,
+            onDeleteClick = viewModel::deleteCurrentScan
         )
     }
 }
@@ -71,6 +79,8 @@ fun ScanDetailsScreen(
 @Composable
 private fun ScanDetailsContent(
     scan: ScanResult,
+    isDeleting: Boolean,
+    onDeleteClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
     val measurement = scan.colorMeasurement
@@ -212,12 +222,11 @@ private fun ScanDetailsContent(
         Spacer(Modifier.height(8.dp))
 
         OutlinedButton(
-            onClick = {
-                //TODO delete scan
-            },
+            onClick = onDeleteClick,
+            enabled = !isDeleting,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Delete Scan")
+            Text(if (isDeleting) "Deleting..." else "Delete Scan")
         }
 
         Spacer(Modifier.height(8.dp))
