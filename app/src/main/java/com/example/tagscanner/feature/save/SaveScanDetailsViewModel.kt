@@ -2,17 +2,23 @@ package com.example.tagscanner.feature.save
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tagscanner.core.util.qualityScoreFor
+import com.example.tagscanner.data.repository.SupabaseScanRepository
 import com.example.tagscanner.domain.model.AnalysisResult
 import com.example.tagscanner.domain.model.ScanDetails
+import com.example.tagscanner.domain.model.ScanResult
+import com.example.tagscanner.domain.model.ScanSource
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.domain.repository.PendingScanResultRepository.observePendingResult
+import com.example.tagscanner.domain.repository.ScanRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SaveScanDetailsViewModel(
-    private val pendingResultScanRepository: PendingScanResultRepository = PendingScanResultRepository
+    private val pendingResultScanRepository: PendingScanResultRepository = PendingScanResultRepository,
+    private val scanRepository: ScanRepository = SupabaseScanRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SaveScanDetailsUiState())
@@ -52,17 +58,36 @@ class SaveScanDetailsViewModel(
 
     fun onSaveScanClicked() {
         val state = _uiState.value
+        val result = state.scanResult ?: return
 
         if (!state.canSave) return
 
-        _uiState.value = state.copy(
-            pendingReuseDetails = ScanDetails(
-                provider = state.provider.trim(),
-                product = state.product.trim(),
-                batch = state.batch.trim(),
-                category = state.category.trim().takeIf { it.isNotBlank() }
-            )
+        val details = ScanDetails(
+            provider = state.provider.trim(),
+            product = state.product.trim(),
+            batch = state.batch.trim(),
+            category = state.category.trim().takeIf { it.isNotBlank() }
         )
+
+        val scanResult = ScanResult(
+            id = "",
+            timestampMillis = System.currentTimeMillis(),
+            source = ScanSource.GALLERY_IMAGE,
+            colorMeasurement = result.colorMeasurement,
+            interpretation = result.interpretation,
+            regionOfInterest = result.regionOfInterest,
+            details = details,
+            qualityScore = qualityScoreFor(result),
+            note = state.note.trim().takeIf { it.isNotBlank() }
+        )
+
+        viewModelScope.launch {
+            scanRepository.saveScan(scanResult)
+
+            _uiState.value = _uiState.value.copy(
+                pendingReuseDetails = details
+            )
+        }
     }
 
     fun clearPendingReuseDetails() {

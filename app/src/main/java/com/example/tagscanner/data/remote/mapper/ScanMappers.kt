@@ -1,6 +1,7 @@
 package com.example.tagscanner.data.remote.mapper
 
 import com.example.tagscanner.data.remote.dto.ScanHistoryDto
+import com.example.tagscanner.data.remote.dto.ScanInsertDto
 import com.example.tagscanner.domain.model.ColorInterpretation
 import com.example.tagscanner.domain.model.ColorMeasurement
 import com.example.tagscanner.domain.model.InterpretationSeverity
@@ -61,4 +62,49 @@ fun ScanHistoryDto.toDomain(): ScanResult {
         qualityScore = qualityScore,
         note = note
     )
+}
+
+fun ScanResult.toScanInsertDto(batchId: String): ScanInsertDto {
+    return ScanInsertDto(
+        batchId = batchId,
+        source = source.toSupabaseValue(),
+
+        red = colorMeasurement.red,
+        green = colorMeasurement.green,
+        blue = colorMeasurement.blue,
+
+        hue = colorMeasurement.hue,
+        saturation = colorMeasurement.saturation,
+        value = colorMeasurement.value,
+        confidence = colorMeasurement.confidence,
+
+        interpretationLabel = interpretation.label,
+        interpretationDescription = interpretation.description,
+        interpretationSeverity = interpretation.severity.toSupabaseValue(),
+
+        roiX = regionOfInterest?.x,
+        roiY = regionOfInterest?.y,
+        roiWidth = regionOfInterest?.width,
+        roiHeight = regionOfInterest?.height,
+
+        qualityScore = qualityScore,
+        note = note,
+        imagePath = null
+    )
+}
+
+private fun ScanSource.toSupabaseValue(): String{
+    return when (this) {
+        ScanSource.LIVE_CAMERA -> "live_camera"
+        ScanSource.GALLERY_IMAGE -> "gallery_image"
+    }
+}
+
+private fun InterpretationSeverity.toSupabaseValue(): String {
+    return when (this) {
+        InterpretationSeverity.NORMAL -> "normal"
+        InterpretationSeverity.WARNING -> "warning"
+        InterpretationSeverity.CRITICAL -> "critical"
+        InterpretationSeverity.UNKNOWN -> "unknown"
+    }
 }
