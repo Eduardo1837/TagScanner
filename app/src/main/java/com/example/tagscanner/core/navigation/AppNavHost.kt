@@ -110,15 +110,8 @@ fun AppNavHost() {
                 )
             }
 
-            composable(
-                route = Route.ScanDetails.route,
-                arguments = listOf(
-                    navArgument("scanId") {
-                        type = NavType.LongType
-                    }
-                )
-            ) { backStackEntry ->
-                val scanId = backStackEntry.arguments?.getLong("scanId") ?: return@composable
+            composable(Route.ScanDetails.route) { backStackEntry ->
+                val scanId = backStackEntry.arguments?.getString("scanId") ?: return@composable
 
                 ScanDetailsScreen(
                     scanId = scanId,

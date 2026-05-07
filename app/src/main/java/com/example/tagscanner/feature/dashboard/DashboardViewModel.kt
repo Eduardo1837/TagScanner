@@ -2,6 +2,7 @@ package com.example.tagscanner.feature.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tagscanner.data.repository.SupabaseScanRepository
 import com.example.tagscanner.domain.model.InterpretationSeverity
 import com.example.tagscanner.domain.repository.FakeScanRepository
 import com.example.tagscanner.domain.repository.ScanRepository
@@ -11,6 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.example.tagscanner.feature.dashboard.ProviderStats
 import com.example.tagscanner.feature.dashboard.BatchStats
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 private var allScans = emptyList<com.example.tagscanner.domain.model.ScanResult>()
@@ -19,7 +22,7 @@ private var selectedProvider: String? = null
 private var selectedProductOrCategory: String? = null
 
 class DashboardViewModel(
-    private val scanRepository: ScanRepository = FakeScanRepository()
+    private val scanRepository: ScanRepository = SupabaseScanRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -54,11 +57,15 @@ class DashboardViewModel(
     }
     private fun updateDashboard() {
         val now = System.currentTimeMillis()
+        val startOfTodayMillis = LocalDate.now()
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
 
         val timeFilteredScans = allScans.filter { scan ->
             when (selectedTimeRange) {
                 DashboardTimeRange.TODAY -> {
-                    now - scan.timestampMillis <= TimeUnit.DAYS.toMillis(1)
+                    scan.timestampMillis >= startOfTodayMillis
                 }
                 DashboardTimeRange.LAST_7_DAYS -> {
                     now - scan.timestampMillis <= TimeUnit.DAYS.toMillis(7)
@@ -156,15 +163,31 @@ class DashboardViewModel(
             }
             .sortedByDescending { it.averageQuality }
 
+        val recentProblematicScans = filteredScans
+            .filter { scan ->
+                scan.interpretation.severity == InterpretationSeverity.WARNING ||
+                        scan.interpretation.severity == InterpretationSeverity.CRITICAL
+            }
+            .sortedByDescending { it.timestampMillis }
+            .take(3)
+
+        val qualityTrend = filteredScans
+            .filter { it.qualityScore != null }
+            .sortedBy { it.timestampMillis }
+            .mapNotNull { it.qualityScore }
+            .takeLast(8)
+
         _uiState.value = DashboardUiState(
             totalScans = filteredScans.size,
             normalCount = normalCount,
             warningCount = warningCount,
             criticalCount = criticalCount,
             averageQuality = averageQuality,
+            qualityTrend = qualityTrend,
             bestProvider = providerStats.firstOrNull()?.provider,
             criticalRate = if (filteredScans.isEmpty()) 0f else criticalCount.toFloat() / filteredScans.size,
             latestScan = filteredScans.maxByOrNull { it.timestampMillis },
+            recentProblematicScans = recentProblematicScans,
             providerStats = providerStats,
             batchStats = batchStats,
             selectedTimeRange = selectedTimeRange,

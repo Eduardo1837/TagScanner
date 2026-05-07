@@ -90,7 +90,7 @@ private fun DashboardContent(
 
         Spacer(Modifier.height(16.dp))
 
-        QualityTrendPlaceholder()
+        QualityTrendCard(values = uiState.qualityTrend)
 
         Spacer(Modifier.height(16.dp))
 
@@ -105,6 +105,12 @@ private fun DashboardContent(
             normalCount = uiState.normalCount,
             warningCount = uiState.warningCount,
             criticalCount = uiState.criticalCount
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        RecentProblematicScansCard(
+            scans = uiState.recentProblematicScans
         )
 
         Spacer(Modifier.height(16.dp))
@@ -254,7 +260,9 @@ private fun LatestScanCard(
 }
 
 @Composable
-private fun QualityTrendPlaceholder() {
+private fun QualityTrendCard(
+    values: List<Int>
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -271,31 +279,65 @@ private fun QualityTrendPlaceholder() {
 
             Spacer(Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(132.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.Bottom
-            ) {
-                listOf(65, 72, 68, 78, 85, 82, 87, 90).forEach { value ->
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight(value / 100f)
-                            .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
-                            .background(Color(0xFF2563EB))
+            if (values.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(132.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFFF9FAFB)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No trend data available",
+                        color = Color(0xFF6B7280),
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(132.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    values.forEach { value ->
+                        val clampedValue = value.coerceIn(0, 100)
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(clampedValue / 100f)
+                                .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
+                                .background(qualityColor(clampedValue))
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                val first = values.first()
+                val last = values.last()
+
+                val trendText = when {
+                    last > first -> "Quality improving over time"
+                    last < first -> "Quality declining over time"
+                    else -> "Quality stable over time"
+                }
+
+                val trendColor = when {
+                    last > first -> Color(0xFF16A34A)
+                    last < first -> Color(0xFFDC2626)
+                    else -> Color(0xFF6B7280)
+                }
+
+                Text(
+                    text = trendText,
+                    color = trendColor,
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(
-                text = "Quality improving over time",
-                color = Color(0xFF16A34A),
-                style = MaterialTheme.typography.labelSmall
-            )
         }
     }
 }
@@ -708,5 +750,106 @@ private fun SmallFilterChip(
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Medium
         )
+    }
+}
+
+@Composable
+private fun RecentProblematicScansCard(
+    scans: List<ScanResult>
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Recent Problematic Scans",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF111827)
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            if (scans.isEmpty()) {
+                Text(
+                    text = "No warning or critical scans",
+                    color = Color(0xFF6B7280),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            } else {
+                scans.forEachIndexed { index, scan ->
+                    ProblematicScanRow(scan = scan)
+
+                    if (index != scans.lastIndex) {
+                        Spacer(Modifier.height(12.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProblematicScanRow(
+    scan: ScanResult
+) {
+    val details = scan.details
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ColorSwatch(
+            color = Color(
+                scan.colorMeasurement.red,
+                scan.colorMeasurement.green,
+                scan.colorMeasurement.blue
+            ),
+            size = 36
+        )
+
+        Spacer(Modifier.width(10.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = details?.provider ?: "Unknown provider",
+                    modifier = Modifier.weight(1f),
+                    color = Color(0xFF111827),
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                StatusBadge(severity = scan.interpretation.severity)
+            }
+
+            Spacer(Modifier.height(2.dp))
+
+            Text(
+                text = "${details?.product ?: "-"} - ${details?.batch ?: "-"}",
+                color = Color(0xFF6B7280),
+                style = MaterialTheme.typography.labelSmall
+            )
+
+            Spacer(Modifier.height(2.dp))
+
+            Text(
+                text = formatTimestamp(scan.timestampMillis),
+                color = Color(0xFF9CA3AF),
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
+}
+
+private fun qualityColor(value: Int): Color {
+    return when {
+        value >= 80 -> Color(0xFF22C55E)
+        value >= 50 -> Color(0xFFF59E0B)
+        else -> Color(0xFFEF4444)
     }
 }

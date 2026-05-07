@@ -2,6 +2,7 @@ package com.example.tagscanner.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tagscanner.data.repository.SupabaseScanRepository
 import com.example.tagscanner.domain.model.InterpretationSeverity
 import com.example.tagscanner.domain.repository.ActiveScanDetailsRepository
 import com.example.tagscanner.domain.repository.FakeScanRepository
@@ -14,7 +15,7 @@ import kotlinx.coroutines.launch
 private var latestScans = emptyList<com.example.tagscanner.domain.model.ScanResult>()
 private var latestActiveDetails: com.example.tagscanner.domain.model.ScanDetails? = null
 class HomeViewModel(
-    private val scanRepository: ScanRepository = FakeScanRepository(),
+    private val scanRepository: ScanRepository = SupabaseScanRepository(),
     private val activeScanDetailsRepository: ActiveScanDetailsRepository = ActiveScanDetailsRepository
 ) : ViewModel() {
 

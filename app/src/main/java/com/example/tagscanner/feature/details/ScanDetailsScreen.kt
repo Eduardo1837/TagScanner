@@ -38,7 +38,7 @@ import com.example.tagscanner.ui.components.screenBackground
 
 @Composable
 fun ScanDetailsScreen(
-    scanId: Long,
+    scanId: String,
     onBackClick: () -> Unit,
     viewModel: ScanDetailsViewModel = viewModel()
 ) {

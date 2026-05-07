@@ -14,7 +14,7 @@ class FakeScanRepository : ScanRepository {
         return scans.asStateFlow()
     }
 
-    override suspend fun getScanById(id: Long): ScanResult? {
+    override suspend fun getScanById(id: String): ScanResult? {
         return scans.value.firstOrNull{ scan ->
             scan.id == id
         }

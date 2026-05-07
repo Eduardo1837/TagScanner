@@ -2,6 +2,7 @@ package com.example.tagscanner.feature.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tagscanner.data.repository.SupabaseScanRepository
 import com.example.tagscanner.domain.repository.FakeScanRepository
 import com.example.tagscanner.domain.repository.ScanRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,7 @@ import kotlinx.coroutines.launch
 import java.time.temporal.TemporalQuery
 
 class HistoryViewModel(
-    private val scanRepository: ScanRepository = FakeScanRepository()
+    private val scanRepository: ScanRepository = SupabaseScanRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryUiState())

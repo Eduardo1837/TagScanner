@@ -1,7 +1,7 @@
 package com.example.tagscanner.domain.model
 //central model
 data class ScanResult(
-    val id: Long,
+    val id: String,
     val timestampMillis: Long,
     val source: ScanSource,
     val colorMeasurement: ColorMeasurement,

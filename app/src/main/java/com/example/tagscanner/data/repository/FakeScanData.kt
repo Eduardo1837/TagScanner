@@ -11,7 +11,7 @@ object FakeScanData {
 
     val scans = listOf(
         ScanResult(
-            id = 1,
+            id = "00000000-0000-0000-0000-000000000001",
             timestampMillis = System.currentTimeMillis() - 1000L * 60 * 5,
             source = ScanSource.GALLERY_IMAGE,
             colorMeasurement = ColorMeasurement(
@@ -39,7 +39,7 @@ object FakeScanData {
             note = "Sample gallery scan"
         ),
         ScanResult(
-            id = 2,
+            id = "00000000-0000-0000-0000-000000000002",
             timestampMillis = System.currentTimeMillis() - 1000L * 60 * 60,
             source = ScanSource.LIVE_CAMERA,
             colorMeasurement = ColorMeasurement(
@@ -67,8 +67,8 @@ object FakeScanData {
             note = "Sample live scan"
         ),
         ScanResult(
-            id = 3,
-            timestampMillis = System.currentTimeMillis() - 1000L * 60 * 60 * 3,
+            id = "00000000-0000-0000-0000-000000000003",
+            timestampMillis = System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 10,
             source = ScanSource.LIVE_CAMERA,
             colorMeasurement = ColorMeasurement(
                 red = 210,
@@ -95,8 +95,8 @@ object FakeScanData {
             note = "Sample critical scan"
         ),
         ScanResult(
-            id = 4,
-            timestampMillis = System.currentTimeMillis() - 1000L * 60 * 60 * 5,
+            id = "00000000-0000-0000-0000-000000000004",
+            timestampMillis = System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 40,
             source = ScanSource.LIVE_CAMERA,
             colorMeasurement = ColorMeasurement(
                 red = 159,
