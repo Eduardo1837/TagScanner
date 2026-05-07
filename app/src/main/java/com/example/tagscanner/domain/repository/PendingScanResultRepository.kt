@@ -1,23 +1,24 @@
 package com.example.tagscanner.domain.repository
 
 import com.example.tagscanner.domain.model.AnalysisResult
+import com.example.tagscanner.domain.model.PendingScan
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object PendingScanResultRepository {
 
-    private val pendingResult = MutableStateFlow<AnalysisResult?>(null)
+    private val pendingScan = MutableStateFlow<PendingScan?>(null)
 
-    fun observePendingResult(): Flow<AnalysisResult?> {
-        return pendingResult.asStateFlow()
+    fun observePendingScan(): Flow<PendingScan?> {
+        return pendingScan.asStateFlow()
     }
 
-    fun setPendingResult(result: AnalysisResult) {
-        pendingResult.value = result
+    fun setPendingScan(scan: PendingScan) {
+        pendingScan.value = scan
     }
 
-    fun clearPendingResult() {
-        pendingResult.value = null
+    fun clearPendingScan() {
+        pendingScan.value = null
     }
 }

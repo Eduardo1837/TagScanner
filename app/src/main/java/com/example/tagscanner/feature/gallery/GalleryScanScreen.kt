@@ -74,8 +74,10 @@ fun GalleryScanScreen(
         onClearDetailsClick = ActiveScanDetailsRepository::clearActiveDetails,
         onSaveResultClick = {
             uiState.analysisResult?.let { result ->
-                PendingScanResultRepository.setPendingResult(result)
-                onSaveResultClick()
+                viewModel.preparePendingScan(
+                    context = context,
+                    onReady = onSaveResultClick
+                )
             }
         },
         onSaveWithCurrentClick = {
@@ -83,8 +85,10 @@ fun GalleryScanScreen(
         },
         onSaveWithNewClick = {
             uiState.analysisResult?.let { result ->
-                PendingScanResultRepository.setPendingResult(result)
-                onSaveResultClick()
+                viewModel.preparePendingScan(
+                    context = context,
+                    onReady = onSaveResultClick
+                )
             }
         }
     )

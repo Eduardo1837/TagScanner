@@ -61,6 +61,12 @@ fun LiveScanScreen(
         viewModel.onPermissionChanged(granted)
     }
 
+    val previewView = remember {
+        PreviewView(context).apply {
+            scaleType = PreviewView.ScaleType.FILL_CENTER
+        }
+    }
+
     LaunchedEffect(Unit) {
         val hasPermission = ContextCompat.checkSelfPermission(
             context,
@@ -86,6 +92,7 @@ fun LiveScanScreen(
             if (uiState.hasCameraPermission) {
                 CameraPreview(
                     viewModel = viewModel,
+                    previewView = previewView,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -135,8 +142,10 @@ fun LiveScanScreen(
             onClearDetailsClick = ActiveScanDetailsRepository::clearActiveDetails,
             onSaveResultClick = {
                 uiState.currentResult?.let { result ->
-                    PendingScanResultRepository.setPendingResult(result)
-                    onSaveResultClick()
+                    viewModel.preparePendingScan(
+                        previewBitmap = previewView.bitmap,
+                        onReady = onSaveResultClick
+                    )
                 }
             },
             onSaveWithCurrentClick = {
@@ -144,8 +153,10 @@ fun LiveScanScreen(
             },
             onSaveWithNewClick = {
                 uiState.currentResult?.let { result ->
-                    PendingScanResultRepository.setPendingResult(result)
-                    onSaveResultClick()
+                    viewModel.preparePendingScan(
+                        previewBitmap = previewView.bitmap,
+                        onReady = onSaveResultClick
+                    )
                 }
             }
         )
@@ -155,17 +166,12 @@ fun LiveScanScreen(
 @Composable
 private fun CameraPreview(
     viewModel: LiveScanViewModel,
+    previewView: PreviewView,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
-    val previewView = remember {
-        PreviewView(context).apply {
-            scaleType = PreviewView.ScaleType.FILL_CENTER
-        }
-    }
-
     DisposableEffect(Unit) {
         onDispose {
             cameraExecutor.shutdown()

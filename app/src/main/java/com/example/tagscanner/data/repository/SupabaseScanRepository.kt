@@ -9,8 +9,8 @@ import com.example.tagscanner.data.remote.dto.ProductInsertDto
 import com.example.tagscanner.data.remote.dto.ProviderDto
 import com.example.tagscanner.data.remote.dto.ProviderInsertDto
 import com.example.tagscanner.data.remote.dto.ScanHistoryDto
-import com.example.tagscanner.data.remote.mapper.toDomain
-import com.example.tagscanner.data.remote.mapper.toScanInsertDto
+import com.example.tagscanner.data.maper.toDomain
+import com.example.tagscanner.data.maper.toScanInsertDto
 import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.domain.repository.ScanRepository
 import io.github.jan.supabase.postgrest.from

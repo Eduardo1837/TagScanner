@@ -6,7 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tagscanner.domain.analyzer.ColorAnalyzer
 import com.example.tagscanner.domain.analyzer.ColorAnalyzerImpl
+import com.example.tagscanner.domain.model.PendingScan
+import com.example.tagscanner.domain.model.ScanSource
+import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.processing.image.BitmapLoader
+import com.example.tagscanner.processing.image.PreviewImageEncoder
 import com.example.tagscanner.processing.image.RoiColorSampler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +22,8 @@ import kotlinx.coroutines.withContext
 class GalleryScanViewModel(
     private val bitmapLoader: BitmapLoader = BitmapLoader(),
     private val colorSampler: RoiColorSampler = RoiColorSampler(),
-    private val colorAnalyzer: ColorAnalyzer = ColorAnalyzerImpl()
+    private val colorAnalyzer: ColorAnalyzer = ColorAnalyzerImpl(),
+    private val previewImageEncoder: PreviewImageEncoder = PreviewImageEncoder()
 ) : ViewModel(){
     private val _uiState = MutableStateFlow(GalleryScanUiState())
     val uiState: StateFlow<GalleryScanUiState> = _uiState.asStateFlow()
@@ -62,6 +67,36 @@ class GalleryScanViewModel(
                     errorMessage = exception.message ?: "Could not analyze image."
                 )
             }
+        }
+    }
+
+    fun preparePendingScan(
+        context: Context,
+        onReady: () -> Unit
+    ) {
+        val state = _uiState.value
+        val result = state.analysisResult ?: return
+        val uri = state.selectedImageUri
+
+        viewModelScope.launch {
+            val previewBytes = withContext(Dispatchers.Default) {
+                uri?.let {
+                    previewImageEncoder.uriToPreviewJpegBytes(
+                        context = context.applicationContext,
+                        uri = it
+                    )
+                }
+            }
+
+            PendingScanResultRepository.setPendingScan(
+                PendingScan(
+                    result = result,
+                    source = ScanSource.GALLERY_IMAGE,
+                    previewJpegBytes = previewBytes
+                )
+            )
+
+            onReady()
         }
     }
 }

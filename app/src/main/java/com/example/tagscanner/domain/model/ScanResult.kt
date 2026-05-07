@@ -9,5 +9,6 @@ data class ScanResult(
     val regionOfInterest: RegionOfInterest?,
     val details: ScanDetails? = null,
     val qualityScore: Int? = null,
-    val note: String? = null
+    val note: String? = null,
+    val imagePath: String? = null
 )

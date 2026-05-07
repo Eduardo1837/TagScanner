@@ -48,7 +48,7 @@ fun SaveScanDetailsScreen(
         onSuggestionClick = viewModel::applyProviderSuggestion,
         onSaveClick = viewModel::onSaveScanClicked,
         onCancelClick = {
-            PendingScanResultRepository.clearPendingResult()
+            PendingScanResultRepository.clearPendingScan()
             onCancelClick()
         }
     )
@@ -58,12 +58,12 @@ fun SaveScanDetailsScreen(
             details = details,
             onConfirmReuse = {
                 ActiveScanDetailsRepository.setActiveDetails(details)
-                PendingScanResultRepository.clearPendingResult()
+                PendingScanResultRepository.clearPendingScan()
                 viewModel.clearPendingReuseDetails()
                 onFinishSave()
             },
             onDismissReuse = {
-                PendingScanResultRepository.clearPendingResult()
+                PendingScanResultRepository.clearPendingScan()
                 viewModel.clearPendingReuseDetails()
                 onFinishSave()
             }

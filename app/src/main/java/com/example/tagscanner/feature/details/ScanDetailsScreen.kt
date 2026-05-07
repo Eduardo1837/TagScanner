@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -23,11 +24,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.tagscanner.core.util.formatTimestamp
+import com.example.tagscanner.data.remote.storage.SupabaseImageStorage
 import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.domain.model.ScanSource
@@ -85,6 +90,22 @@ private fun ScanDetailsContent(
             fontWeight = FontWeight.SemiBold,
             color = Color(0xFF111827)
         )
+
+        scan.imagePath?.let { path ->
+            val imageUrl = SupabaseImageStorage().publicUrl(path)
+
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "Scan preview",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(Modifier.height(12.dp))
+        }
 
         Spacer(Modifier.height(16.dp))
 

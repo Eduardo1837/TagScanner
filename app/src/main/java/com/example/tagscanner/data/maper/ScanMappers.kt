@@ -1,4 +1,4 @@
-package com.example.tagscanner.data.remote.mapper
+package com.example.tagscanner.data.maper
 
 import com.example.tagscanner.data.remote.dto.ScanHistoryDto
 import com.example.tagscanner.data.remote.dto.ScanInsertDto
@@ -60,7 +60,8 @@ fun ScanHistoryDto.toDomain(): ScanResult {
             category = category
         ),
         qualityScore = qualityScore,
-        note = note
+        note = note,
+        imagePath = imagePath
     )
 }
 
@@ -89,7 +90,7 @@ fun ScanResult.toScanInsertDto(batchId: String): ScanInsertDto {
 
         qualityScore = qualityScore,
         note = note,
-        imagePath = null
+        imagePath = imagePath
     )
 }
 

@@ -1,15 +1,26 @@
 package com.example.tagscanner.feature.live
 
+import android.graphics.Bitmap
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.tagscanner.domain.analyzer.ColorAnalyzer
 import com.example.tagscanner.domain.analyzer.ColorAnalyzerImpl
+import com.example.tagscanner.domain.model.PendingScan
 import com.example.tagscanner.domain.model.RegionOfInterest
 import com.example.tagscanner.domain.model.RgbColor
+import com.example.tagscanner.domain.model.ScanSource
+import com.example.tagscanner.domain.repository.PendingScanResultRepository
+import com.example.tagscanner.processing.image.PreviewImageEncoder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
+
+private val previewImageEncoder = PreviewImageEncoder()
 
 class LiveScanViewModel(
     private val colorAnalyzer: ColorAnalyzer = ColorAnalyzerImpl()
@@ -137,6 +148,31 @@ class LiveScanViewModel(
             green = (greenSum / count).toInt(),
             blue = (blueSum / count).toInt()
         )
+    }
+
+    fun preparePendingScan(
+        previewBitmap: Bitmap?,
+        onReady: () -> Unit
+    ) {
+        val result = _uiState.value.currentResult ?: return
+
+        viewModelScope.launch {
+            val previewBytes = withContext(Dispatchers.Default) {
+                previewBitmap?.let {
+                    previewImageEncoder.bitmapToPreviewJpegBytes(it)
+                }
+            }
+
+            PendingScanResultRepository.setPendingScan(
+                PendingScan(
+                    result = result,
+                    source = ScanSource.LIVE_CAMERA,
+                    previewJpegBytes = previewBytes
+                )
+            )
+
+            onReady()
+        }
     }
 
     private companion object {
