@@ -1,5 +1,6 @@
 package com.example.tagscanner.feature.dashboard
 
+import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -11,8 +12,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
@@ -21,13 +27,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tagscanner.core.util.formatTimestamp
 import com.example.tagscanner.domain.model.ScanResult
@@ -35,6 +48,8 @@ import com.example.tagscanner.ui.components.ColorSwatch
 import com.example.tagscanner.ui.components.EmptyState
 import com.example.tagscanner.ui.components.StatusBadge
 import com.example.tagscanner.ui.components.screenBackground
+import kotlinx.coroutines.delay
+
 
 @Composable
 fun DashboardScreen(
@@ -656,18 +671,31 @@ private fun DashboardFilters(
             onSelected = onTimeRangeSelected
         )
 
-        FilterStringRow(
-            title = "Provider",
-            values = uiState.availableProviders,
-            selectedValue = uiState.selectedProvider,
-            onSelected = onProviderSelected
-        )
+//        FilterStringRow(
+//            title = "Provider",
+//            values = uiState.availableProviders,
+//            selectedValue = uiState.selectedProvider,
+//            onSelected = onProviderSelected
+//        )
+//
+//        FilterStringRow(
+//            title = "Product / Category",
+//            values = uiState.availableProductsOrCategories,
+//            selectedValue = uiState.selectedProductOrCategory,
+//            onSelected = onProductOrCategorySelected
+//        )
 
-        FilterStringRow(
-            title = "Product / Category",
-            values = uiState.availableProductsOrCategories,
+        SearchableDropdownFilter(
+            label = "Provider",
+            options = uiState.availableProviders,
+            selectedValue = uiState.selectedProvider,
+            onValueSelected = onProviderSelected
+        )
+        SearchableDropdownFilter(
+            label = "Product / Category",
+            options = uiState.availableProductsOrCategories,
             selectedValue = uiState.selectedProductOrCategory,
-            onSelected = onProductOrCategorySelected
+            onValueSelected = onProductOrCategorySelected
         )
     }
 }
@@ -755,6 +783,106 @@ private fun SmallFilterChip(
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Medium
         )
+    }
+}
+@Composable
+fun SearchableDropdownFilter(
+    label: String,
+    options: List<String>,
+    selectedValue: String?,
+    onValueSelected: (String?) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+
+    val filteredOptions = options.filter {
+        it.contains(searchQuery, ignoreCase = true)
+    }
+
+    LaunchedEffect(expanded) {
+        if (expanded) {
+            delay(100)
+            focusRequester.requestFocus()
+        }
+    }
+
+    Box {
+        // Trigger chip (same style as before)
+        Box(
+            modifier = Modifier
+                .background(
+                    color = if (selectedValue != null) Color(0xFF2563EB) else Color(0xFFF3F4F6),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .clickable { expanded = true }
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "$label: ${selectedValue ?: "All"}",
+                    color = if (selectedValue != null) Color.White else Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = if (selectedValue != null) Color.White else Color.Black,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = {
+                expanded = false
+                searchQuery = ""
+            }
+        ) {
+            // Search field — now receives input normally
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Search...") },
+                singleLine = true,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .focusRequester(focusRequester)
+            )
+
+            // "All" option
+            DropdownMenuItem(
+                text = { Text("All") },
+                onClick = {
+                    onValueSelected(null)
+                    expanded = false
+                    searchQuery = ""
+                }
+            )
+
+            // Filtered options
+            filteredOptions.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = option,
+                            fontWeight = if (option == selectedValue) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    onClick = {
+                        onValueSelected(option)
+                        expanded = false
+                        searchQuery = ""
+                    },
+                    trailingIcon = if (option == selectedValue) {
+                        { Icon(Icons.Default.Check, contentDescription = null, tint = Color(0xFF2563EB)) }
+                    } else null
+                )
+            }
+        }
     }
 }
 
