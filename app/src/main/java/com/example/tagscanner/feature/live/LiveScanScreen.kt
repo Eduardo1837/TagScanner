@@ -88,7 +88,7 @@ fun LiveScanScreen(
 
         Box(
             modifier = Modifier
-                .weight(1f)
+                .weight(0.55f)
                 .fillMaxWidth()
                 .background(Color(0xFF111827))
         ) {
