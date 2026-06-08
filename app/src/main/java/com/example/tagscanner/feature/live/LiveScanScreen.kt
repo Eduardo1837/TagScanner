@@ -9,6 +9,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -128,6 +130,20 @@ fun LiveScanScreen(
                             .padding(16.dp)
                     )
                 }
+
+                val bannerAlpha by animateFloatAsState(
+                    targetValue = if (uiState.savedFeedback) 1f else 0f,
+                    label = "savedFeedbackAlpha"
+                )
+                if (bannerAlpha > 0f) {
+                    SavedFeedbackBanner(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                            .alpha(bannerAlpha)
+                    )
+                }
             } else {
                 PermissionState(
                     onGrantClick = {
@@ -150,11 +166,12 @@ fun LiveScanScreen(
                 }
             },
             onSaveWithCurrentClick = {
-               viewModel.preparePendingScan(
-                   previewBitmap = previewView.bitmap,
-                   initialDetails = activeDetails,
-                   onReady = onSaveResultClick
-               )
+                activeDetails?.let {
+                    viewModel.saveWithCurrentDetails(
+                        previewBitmap = previewView.bitmap,
+                        activeDetails = it
+                    )
+                }
             },
             onSaveWithNewClick = {
                 uiState.currentResult?.let { result ->
@@ -251,6 +268,8 @@ private fun LiveScanHeader() {
         Spacer(Modifier.height(8.dp))
 
         ProfileSelectorRow()
+
+        Spacer(Modifier.height(4.dp))
     }
 }
 
@@ -285,7 +304,7 @@ private fun RoiFrame(
 ) {
     Box(
         modifier = modifier
-            .size(192.dp)
+            .size(96.dp)
             .border(
                 width = 4.dp,
                 color = Color.White.copy(alpha = 0.85f),
@@ -412,6 +431,34 @@ private fun LiveScanBottomActions(
             ) {
                 Text("Waiting for detection")
             }
+        }
+    }
+}
+
+@Composable
+private fun SavedFeedbackBanner(modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF166534))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = "✓",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Scan salvat cu succes",
+                color = Color.White,
+                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

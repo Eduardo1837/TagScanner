@@ -6,5 +6,6 @@ data class LiveScanUiState(
     val hasCameraPermission: Boolean = false,
     val currentResult: AnalysisResult? = null,
     val isAnalyzing: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val savedFeedback: Boolean = false
 )

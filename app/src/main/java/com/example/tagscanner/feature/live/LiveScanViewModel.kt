@@ -6,15 +6,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tagscanner.domain.analyzer.ColorAnalyzer
 import com.example.tagscanner.domain.analyzer.ColorAnalyzerImpl
+import com.example.tagscanner.core.util.qualityScoreFor
+import com.example.tagscanner.data.remote.storage.SupabaseImageStorage
+import com.example.tagscanner.data.repository.SupabaseScanRepository
 import com.example.tagscanner.domain.model.PendingScan
 import com.example.tagscanner.domain.model.RegionOfInterest
 import com.example.tagscanner.domain.model.RgbColor
 import com.example.tagscanner.domain.model.ScanDetails
+import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.domain.model.ScanSource
 import com.example.tagscanner.domain.repository.ActiveLabelProfileRepository
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
+import com.example.tagscanner.domain.repository.ScanRepository
 import com.example.tagscanner.processing.image.PreviewImageEncoder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +31,9 @@ import kotlin.math.roundToInt
 private val previewImageEncoder = PreviewImageEncoder()
 
 class LiveScanViewModel(
-    private val colorAnalyzer: ColorAnalyzer = ColorAnalyzerImpl()
+    private val colorAnalyzer: ColorAnalyzer = ColorAnalyzerImpl(),
+    private val scanRepository: ScanRepository = SupabaseScanRepository(),
+    private val imageStorage: SupabaseImageStorage = SupabaseImageStorage()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LiveScanUiState(isAnalyzing = true))
@@ -180,8 +188,42 @@ class LiveScanViewModel(
         }
     }
 
+    fun saveWithCurrentDetails(
+        previewBitmap: Bitmap?,
+        activeDetails: ScanDetails
+    ) {
+        val result = _uiState.value.currentResult ?: return
+
+        viewModelScope.launch {
+            val previewBytes = withContext(Dispatchers.Default) {
+                previewBitmap?.let { previewImageEncoder.bitmapToPreviewJpegBytes(it) }
+            }
+
+            val imagePath = previewBytes?.let { imageStorage.uploadScanPreview(it) }
+
+            val scanResult = ScanResult(
+                id = "",
+                timestampMillis = System.currentTimeMillis(),
+                source = ScanSource.LIVE_CAMERA,
+                colorMeasurement = result.colorMeasurement,
+                interpretation = result.interpretation,
+                regionOfInterest = result.regionOfInterest,
+                details = activeDetails,
+                qualityScore = qualityScoreFor(result),
+                note = null,
+                imagePath = imagePath
+            )
+
+            scanRepository.saveScan(scanResult)
+
+            _uiState.value = _uiState.value.copy(savedFeedback = true)
+            delay(2500)
+            _uiState.value = _uiState.value.copy(savedFeedback = false)
+        }
+    }
+
     private companion object {
-        const val ROI_FRACTION = 0.22f
+        const val ROI_FRACTION = 0.11f
         const val ANALYSIS_INTERVAL_MILLIS = 250L
     }
 }
