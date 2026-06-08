@@ -9,6 +9,7 @@ data class SaveScanDetailsUiState(
     val product: String = "",
     val batch: String = "",
     val category: String = "",
+    val categoryLocked: Boolean = false,
     val note: String = "",
     val pendingReuseDetails: ScanDetails? = null,
     val providerSuggestions: List<String> = listOf(

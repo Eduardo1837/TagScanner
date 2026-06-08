@@ -10,6 +10,7 @@ import com.example.tagscanner.domain.model.PendingScan
 import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.domain.model.ScanSource
+import com.example.tagscanner.domain.repository.ActiveLabelProfileRepository
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.domain.repository.ScanRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -109,12 +110,14 @@ class SaveScanDetailsViewModel(
             pendingResultScanRepository.observePendingScan().collect { scan ->
                 pendingScan = scan
 
+                val profileName = ActiveLabelProfileRepository.currentProfile().displayName
                 _uiState.value = _uiState.value.copy(
                     scanResult = scan?.result,
                     provider = scan?.initialDetails?.provider.orEmpty(),
                     product = scan?.initialDetails?.product.orEmpty(),
                     batch = scan?.initialDetails?.batch.orEmpty(),
-                    category = scan?.initialDetails?.category.orEmpty()
+                    category = profileName,
+                    categoryLocked = true
                 )
             }
         }

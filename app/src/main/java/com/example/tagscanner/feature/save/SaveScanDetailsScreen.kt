@@ -43,7 +43,6 @@ fun SaveScanDetailsScreen(
         onProviderChanged = viewModel::onProviderChanged,
         onProductChanged = viewModel::onProductChanged,
         onBatchChanged = viewModel::onBatchChanged,
-        onCategoryChanged = viewModel::onCategoryChanged,
         onNoteChanged = viewModel::onNoteChanged,
         onSuggestionClick = viewModel::applyProviderSuggestion,
         onSaveClick = viewModel::onSaveScanClicked,
@@ -77,7 +76,6 @@ private fun SaveScanDetailsContent(
     onProviderChanged: (String) -> Unit,
     onProductChanged: (String) -> Unit,
     onBatchChanged: (String) -> Unit,
-    onCategoryChanged: (String) -> Unit,
     onNoteChanged: (String) -> Unit,
     onSuggestionClick: (String) -> Unit,
     onSaveClick: () -> Unit,
@@ -132,9 +130,10 @@ private fun SaveScanDetailsContent(
 
         DetailsTextField(
             value = uiState.category,
-            onValueChange = onCategoryChanged,
+            onValueChange = {},
             label = "Category",
-            placeholder = "Optional category"
+            placeholder = "",
+            enabled = !uiState.categoryLocked
         )
 
         Spacer(Modifier.height(12.dp))
@@ -252,7 +251,8 @@ private fun DetailsTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    placeholder: String
+    placeholder: String,
+    enabled: Boolean = true
 ) {
     OutlinedTextField(
         value = value,
@@ -261,11 +261,16 @@ private fun DetailsTextField(
         placeholder = { Text(placeholder) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
+        enabled = enabled,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
             focusedBorderColor = Color(0xFF2563EB),
-            unfocusedBorderColor = Color(0xFFE5E7EB)
+            unfocusedBorderColor = Color(0xFFE5E7EB),
+            disabledContainerColor = Color(0xFFF3F4F6),
+            disabledBorderColor = Color(0xFFE5E7EB),
+            disabledTextColor = Color(0xFF374151),
+            disabledLabelColor = Color(0xFF6B7280)
         )
     )
 }
