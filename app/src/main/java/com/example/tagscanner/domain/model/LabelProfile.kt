@@ -83,8 +83,8 @@ sealed class LabelProfile(
                 severity = InterpretationSeverity.NORMAL
             ),
             ColorRule(
-                hueRanges = listOf(100f..140f),
-                minSaturation = 0.40f,
+                hueRanges = listOf(100f..145f),
+                minSaturation = 0.30f,
                 minValue = 0.20f,
                 maxValue = 0.50f,
                 label = "Degradare incipientă",
