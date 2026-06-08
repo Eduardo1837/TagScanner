@@ -14,7 +14,8 @@ data class ColorRule(
 
 /**
  * A label profile defines how detected colors are interpreted for a specific
- * indicator chemistry / product category.
+ * product category. The underlying chemistry is hidden from the user — they
+ * only see product-level names.
  *
  * The active profile is held in [ActiveLabelProfileRepository] for the
  * duration of the session and shared across all scan screens.
@@ -22,19 +23,14 @@ data class ColorRule(
 sealed class LabelProfile(
     val id: String,
     val displayName: String,
-    val emoji: String,
-    val subtitle: String,
     val colorRules: List<ColorRule>
 ) {
-    // ── Tip 1 — TTI Acid Lactic ──────────────────────────────────────────────
-    // Produse lactate și alimente cu fermentație (iaurt, brânză, carne procesată).
-    // Indicator: acumulare acid lactic produs de bacterii.
+    // ── Produse Lactate ───────────────────────────────────────────────────────
+    // Indicator: TTI Acid Lactic — acumulare acid lactic bacterian.
     // Progresie: verde închis → galben-verzui → portocaliu → roșu
-    object AcidLactic : LabelProfile(
-        id = "acid_lactic",
-        displayName = "TTI Acid Lactic",
-        emoji = "🧀",
-        subtitle = "Lactate, iaurt, brânză, carne procesată",
+    object ProduseLactate : LabelProfile(
+        id = "produse_lactate",
+        displayName = "Produse Lactate",
         colorRules = listOf(
             ColorRule(
                 hueRanges = listOf(100f..160f),
@@ -45,7 +41,7 @@ sealed class LabelProfile(
             ColorRule(
                 hueRanges = listOf(65f..99f),
                 label = "Degradare incipientă",
-                description = "Început de fermentație bacteriană. Consumați în cel mai scurt timp.",
+                description = "Început de fermentație bacteriană. Consumați cât mai curând.",
                 severity = InterpretationSeverity.WARNING
             ),
             ColorRule(
@@ -63,15 +59,12 @@ sealed class LabelProfile(
         )
     )
 
-    // ── Tip 2 — Bromocresol (pește și fructe de mare) ────────────────────────
-    // Pește, fructe de mare, carne de pasăre.
-    // Indicator: amine volatile (amoniac, trimetilamină) din proteine în descompunere.
-    // Progresie: galben-muștar → verde olive → verde închis/negru → mov-violet
-    object Bromocresol : LabelProfile(
-        id = "bromocresol",
-        displayName = "Bromocresol",
-        emoji = "🐟",
-        subtitle = "Pește, fructe de mare, carne de pasăre",
+    // ── Pește & Fructe de Mare ────────────────────────────────────────────────
+    // Indicator: Bromocresol — detectează amine volatile (amoniac, TMA).
+    // Progresie: galben-muștar → verde olive → verde închis → mov-violet
+    object PesteSiFructeDeMare : LabelProfile(
+        id = "peste_fructe_mare",
+        displayName = "Pește & Fructe de Mare",
         colorRules = listOf(
             ColorRule(
                 hueRanges = listOf(40f..64f),
@@ -100,19 +93,16 @@ sealed class LabelProfile(
         )
     )
 
-    // ── Tip 3 — Antocianine naturale (varză roșie) ───────────────────────────
-    // Carne roșie și produse de origine animală.
-    // Indicator: baze volatile (amoniac, amine biogene) care cresc pH-ul.
+    // ── Carne Roșie ──────────────────────────────────────────────────────────
+    // Indicator: Antocianine naturale (varză roșie) — sensibil la baze volatile.
     // Progresie: roșu-purpuriu → mov → albastru → albastru-verzui
-    object Antocianine : LabelProfile(
-        id = "antocianine",
-        displayName = "Antocianine",
-        emoji = "🥩",
-        subtitle = "Carne roșie, produse de origine animală",
+    object CarneRosie : LabelProfile(
+        id = "carne_rosie",
+        displayName = "Carne Roșie",
         colorRules = listOf(
             ColorRule(
                 hueRanges = listOf(310f..360f, 0f..15f),
-                label = "Proaspăt",
+                label = "Proaspătă",
                 description = "Carne proaspătă. pH normal, amine biogene absente.",
                 severity = InterpretationSeverity.NORMAL
             ),
@@ -130,27 +120,24 @@ sealed class LabelProfile(
             ),
             ColorRule(
                 hueRanges = listOf(155f..195f),
-                label = "Alterat",
-                description = "Produs complet alterat. Nu consumați.",
+                label = "Alterată",
+                description = "Carne complet alterată. Nu consumați.",
                 severity = InterpretationSeverity.CRITICAL
             )
         )
     )
 
-    // ── Tip 4 — AIEgen pe hârtie (carne și seafood) ──────────────────────────
-    // Carne proaspătă și fructe de mare. Generație nouă — compuși fluorescenți AIE.
-    // Indicator: vapori de amine biogene (putresceină, cadaverină).
+    // ── Carne de Pasăre ──────────────────────────────────────────────────────
+    // Indicator: AIEgen pe hârtie — compuși fluorescenți, sensibilitate ridicată.
     // Progresie: albastru-cobalt → cyan → verde-sage → galben-ocru
-    object AIEgen : LabelProfile(
-        id = "aiegen",
-        displayName = "AIEgen",
-        emoji = "🦐",
-        subtitle = "Carne proaspătă, seafood — indicator fluorescent",
+    object CarneDePassare : LabelProfile(
+        id = "carne_pasare",
+        displayName = "Carne de Pasăre",
         colorRules = listOf(
             ColorRule(
                 hueRanges = listOf(210f..245f),
-                label = "Proaspăt",
-                description = "Produs proaspăt. Nivel nedetectabil de amine biogene.",
+                label = "Proaspătă",
+                description = "Carne proaspătă. Nivel nedetectabil de amine biogene.",
                 severity = InterpretationSeverity.NORMAL
             ),
             ColorRule(
@@ -167,8 +154,8 @@ sealed class LabelProfile(
             ),
             ColorRule(
                 hueRanges = listOf(35f..65f),
-                label = "Alterat",
-                description = "Produs complet alterat. Nu consumați.",
+                label = "Alterată",
+                description = "Carne complet alterată. Nu consumați.",
                 severity = InterpretationSeverity.CRITICAL
             )
         )
@@ -177,11 +164,16 @@ sealed class LabelProfile(
     // ── Companion ────────────────────────────────────────────────────────────
 
     companion object {
-        val all: List<LabelProfile> = listOf(AcidLactic, Bromocresol, Antocianine, AIEgen)
+        val all: List<LabelProfile> = listOf(
+            ProduseLactate,
+            PesteSiFructeDeMare,
+            CarneRosie,
+            CarneDePassare
+        )
 
-        fun default(): LabelProfile = AcidLactic
+        fun default(): LabelProfile = ProduseLactate
 
         fun fromId(id: String): LabelProfile =
-            all.firstOrNull { it.id == id } ?: AcidLactic
+            all.firstOrNull { it.id == id } ?: ProduseLactate
     }
 }
