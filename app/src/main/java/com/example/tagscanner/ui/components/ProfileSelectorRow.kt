@@ -7,12 +7,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Grass
 import androidx.compose.material.icons.filled.Opacity
-import androidx.compose.material.icons.filled.Waves
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,23 +17,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.tagscanner.R
 import com.example.tagscanner.domain.model.LabelProfile
 import com.example.tagscanner.domain.repository.ActiveLabelProfileRepository
 
 // ── Icon mapping (UI layer — keeps domain model free of Compose deps) ────────
 
-private val LabelProfile.icon: ImageVector
-    get() = when (this) {
-        is LabelProfile.ProduseLactate      -> Icons.Filled.Opacity   // picătură — lapte/lichid
-        is LabelProfile.PesteSiFructeDeMare -> Icons.Filled.Waves     // valuri — apă/mare
-        is LabelProfile.CarneRosie          -> Icons.Filled.Grass     // organic/natural
-        is LabelProfile.CarneDePassare      -> Icons.Filled.AcUnit    // cristal/fluorescent AIEgen
+@Composable
+private fun LabelProfile.ProfileIcon(modifier: Modifier = Modifier, tint: Color) {
+    when (this) {
+        is LabelProfile.ProduseLactate ->
+            Icon(imageVector = Icons.Filled.Opacity, contentDescription = null, tint = tint, modifier = modifier)
+        is LabelProfile.PesteSiFructeDeMare ->
+            Icon(painter = painterResource(R.drawable.ic_fish), contentDescription = null, tint = tint, modifier = modifier)
+        is LabelProfile.CarneRosie ->
+            Icon(painter = painterResource(R.drawable.ic_cow_head), contentDescription = null, tint = tint, modifier = modifier)
+        is LabelProfile.CarneDePassare ->
+            Icon(painter = painterResource(R.drawable.ic_chicken_head), contentDescription = null, tint = tint, modifier = modifier)
     }
+}
 
 // ── Colors per profile ───────────────────────────────────────────────────────
 
@@ -101,9 +105,7 @@ fun ProfileSelectorRow(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            Icon(
-                imageVector = activeProfile.icon,
-                contentDescription = null,
+            activeProfile.ProfileIcon(
                 tint = activeProfile.accentColor,
                 modifier = Modifier.size(14.dp)
             )
@@ -246,9 +248,7 @@ private fun ProfileCard(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = profile.icon,
-                    contentDescription = null,
+                profile.ProfileIcon(
                     tint = contentColor,
                     modifier = Modifier.size(22.dp)
                 )

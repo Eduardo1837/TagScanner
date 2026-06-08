@@ -1,0 +1,30 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Creasta -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M9,7 Q8,4 10,5 Q10,3 12,4 Q12,2 14,3.5 Q13,6 12,6.5 Z" />
+    <!-- Capul -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M7,11 A5,5 0 1 1 17,11 A5,5 0 1 1 7,11 Z" />
+    <!-- Ciocul -->
+    <path
+        android:fillColor="#FFDDAA00"
+        android:pathData="M16,10 L20,11 L16,12 Z" />
+    <!-- Bărbia (wattle) -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M15,13 Q14,16 12,15 Q13,13 15,13 Z" />
+    <!-- Ochiul -->
+    <path
+        android:fillColor="#FF222222"
+        android:pathData="M11,10 A1.2,1.2 0 1,1 11,12.4 A1.2,1.2 0 1,1 11,10 Z" />
+    <!-- Reflexia ochiului -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11.5,10.5 A0.4,0.4 0 1,1 11.5,11.3 A0.4,0.4 0 1,1 11.5,10.5 Z" />
+</vector>

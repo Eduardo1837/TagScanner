@@ -1,0 +1,24 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Coada pestelui -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M2,8 L6,12 L2,16 Z" />
+    <!-- Corpul pestelui -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M6,9 Q10,5 17,8 Q20,9.5 20,12 Q20,14.5 17,16 Q10,19 6,15 Z" />
+    <!-- Ochiul -->
+    <path
+        android:fillColor="@android:color/black"
+        android:pathData="M16,11 A1,1 0 1,1 16,13 A1,1 0 1,1 16,11 Z" />
+    <!-- Branhia -->
+    <path
+        android:strokeColor="@android:color/black"
+        android:strokeWidth="0.8"
+        android:fillColor="#00000000"
+        android:pathData="M14,8.5 Q13,12 14,15.5" />
+</vector>

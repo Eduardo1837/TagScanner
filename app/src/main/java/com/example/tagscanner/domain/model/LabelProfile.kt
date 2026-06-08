@@ -2,11 +2,19 @@ package com.example.tagscanner.domain.model
 
 /**
  * A single color rule within a label profile.
- * [hueRanges] is a list of hue intervals (0–360°) that match this rule.
+ *
+ * [hueRanges] — list of hue intervals (0–360°). Empty list means any hue.
  * Multiple ranges handle colors that wrap around 0°/360° (e.g. red).
+ *
+ * [minSaturation]/[maxSaturation] — saturation bounds (0–1). Defaults cover full range.
+ * [minValue]/[maxValue]           — brightness bounds  (0–1). Defaults cover full range.
  */
 data class ColorRule(
     val hueRanges: List<ClosedFloatingPointRange<Float>>,
+    val minSaturation: Float = 0f,
+    val maxSaturation: Float = 1f,
+    val minValue: Float = 0f,
+    val maxValue: Float = 1f,
     val label: String,
     val description: String,
     val severity: InterpretationSeverity
@@ -61,31 +69,42 @@ sealed class LabelProfile(
 
     // ── Pește & Fructe de Mare ────────────────────────────────────────────────
     // Indicator: Bromocresol — detectează amine volatile (amoniac, TMA).
-    // Progresie: galben-muștar → verde olive → verde închis → mov-violet
+    // Progresie: galben-muștar → verde olive → gri închis → mov-violet
     object PesteSiFructeDeMare : LabelProfile(
         id = "peste_fructe_mare",
         displayName = "Pește & Fructe de Mare",
         colorRules = listOf(
             ColorRule(
-                hueRanges = listOf(40f..64f),
+                hueRanges = listOf(40f..55f),
+                minSaturation = 0.50f,
+                minValue = 0.60f,
                 label = "Proaspăt",
                 description = "Produs proaspăt. Nivel minim de amine volatile.",
                 severity = InterpretationSeverity.NORMAL
             ),
             ColorRule(
-                hueRanges = listOf(65f..99f),
+                hueRanges = listOf(100f..140f),
+                minSaturation = 0.40f,
+                minValue = 0.20f,
+                maxValue = 0.50f,
                 label = "Degradare incipientă",
                 description = "Creștere ușoară a aminelor volatile. Consumați cât mai curând.",
                 severity = InterpretationSeverity.WARNING
             ),
+            // Stage 3: any hue, low saturation + low brightness — checked before quality guards
             ColorRule(
-                hueRanges = listOf(100f..160f),
+                hueRanges = emptyList(),
+                maxSaturation = 0.15f,
+                maxValue = 0.20f,
                 label = "Degradare medie",
                 description = "Nivel ridicat de amoniac și trimetilamină. Produs nerecomandat.",
                 severity = InterpretationSeverity.CRITICAL
             ),
             ColorRule(
-                hueRanges = listOf(265f..310f),
+                hueRanges = listOf(260f..290f),
+                minSaturation = 0.30f,
+                minValue = 0.30f,
+                maxValue = 0.65f,
                 label = "Alterat",
                 description = "Produs complet alterat. Nu consumați.",
                 severity = InterpretationSeverity.CRITICAL
