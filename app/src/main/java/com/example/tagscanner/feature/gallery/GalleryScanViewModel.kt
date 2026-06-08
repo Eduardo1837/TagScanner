@@ -9,6 +9,7 @@ import com.example.tagscanner.domain.analyzer.ColorAnalyzerImpl
 import com.example.tagscanner.domain.model.PendingScan
 import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.model.ScanSource
+import com.example.tagscanner.domain.repository.ActiveLabelProfileRepository
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.processing.image.BitmapLoader
 import com.example.tagscanner.processing.image.PreviewImageEncoder
@@ -17,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -25,35 +27,56 @@ class GalleryScanViewModel(
     private val colorSampler: RoiColorSampler = RoiColorSampler(),
     private val colorAnalyzer: ColorAnalyzer = ColorAnalyzerImpl(),
     private val previewImageEncoder: PreviewImageEncoder = PreviewImageEncoder()
-) : ViewModel(){
+) : ViewModel() {
+
     private val _uiState = MutableStateFlow(GalleryScanUiState())
     val uiState: StateFlow<GalleryScanUiState> = _uiState.asStateFlow()
 
-    fun onImageSelected(
-        context: Context,
-        uri: Uri
-    ) {
+    // Retained so we can re-analyze when the label profile changes mid-session.
+    private var applicationContext: Context? = null
+
+    init {
+        // Re-analyze the current image whenever the active label profile changes.
+        viewModelScope.launch {
+            ActiveLabelProfileRepository.observeActiveProfile()
+                .drop(1) // skip the initial value — no image selected yet
+                .collect { reAnalyzeCurrentImage() }
+        }
+    }
+
+    fun onImageSelected(context: Context, uri: Uri) {
+        applicationContext = context.applicationContext
+
         _uiState.value = _uiState.value.copy(
             selectedImageUri = uri,
             isLoading = true,
             errorMessage = null
         )
 
+        analyzeUri(uri)
+    }
+
+    private fun reAnalyzeCurrentImage() {
+        val uri = _uiState.value.selectedImageUri ?: return
+        val ctx = applicationContext ?: return
+        // Update loading state without wiping the existing result immediately
+        _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+        analyzeUri(uri)
+    }
+
+    private fun analyzeUri(uri: Uri) {
         viewModelScope.launch {
             try {
-                val result = withContext(Dispatchers.Default){
+                val result = withContext(Dispatchers.Default) {
                     val bitmap = bitmapLoader.loadBitmapFromUri(
-                        context = context,
+                        context = requireNotNull(applicationContext),
                         uri = uri
                     )
-
-                    val sampledColor = colorSampler.sampleCenter(
-                        bitmap = bitmap
-                    )
-
+                    val sampledColor = colorSampler.sampleCenter(bitmap = bitmap)
                     colorAnalyzer.analyzeColor(
                         rgbColor = sampledColor,
-                        regionOfInterest = null
+                        regionOfInterest = null,
+                        labelProfile = ActiveLabelProfileRepository.currentProfile()
                     )
                 }
 
@@ -62,7 +85,7 @@ class GalleryScanViewModel(
                     isLoading = false,
                     errorMessage = null
                 )
-            } catch (exception: Exception){
+            } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     errorMessage = exception.message ?: "Could not analyze image."

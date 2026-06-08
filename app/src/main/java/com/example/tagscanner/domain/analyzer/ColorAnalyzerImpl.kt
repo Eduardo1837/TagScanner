@@ -3,15 +3,18 @@ package com.example.tagscanner.domain.analyzer
 import android.graphics.Color
 import com.example.tagscanner.domain.model.AnalysisResult
 import com.example.tagscanner.domain.model.ColorMeasurement
+import com.example.tagscanner.domain.model.LabelProfile
 import com.example.tagscanner.domain.model.RegionOfInterest
 import com.example.tagscanner.domain.model.RgbColor
 
 class ColorAnalyzerImpl(
     private val colorClassifier: ColorClassifier = ColorClassifier()
 ) : ColorAnalyzer {
+
     override fun analyzeColor(
         rgbColor: RgbColor,
-        regionOfInterest: RegionOfInterest?
+        regionOfInterest: RegionOfInterest?,
+        labelProfile: LabelProfile
     ): AnalysisResult {
         val hsv = FloatArray(3)
 
@@ -35,7 +38,7 @@ class ColorAnalyzerImpl(
             )
         )
 
-        val interpretation = colorClassifier.classify(measurement)
+        val interpretation = colorClassifier.classify(measurement, labelProfile)
 
         return AnalysisResult(
             colorMeasurement = measurement,
@@ -48,9 +51,8 @@ class ColorAnalyzerImpl(
         saturation: Float,
         value: Float
     ): Float {
-        val saturationScore = saturation.coerceIn(0f,1f)
-        val brightnessScore = value.coerceIn(0f,1f)
-
-        return (saturationScore * brightnessScore).coerceIn(0f,1f)
+        val saturationScore = saturation.coerceIn(0f, 1f)
+        val brightnessScore = value.coerceIn(0f, 1f)
+        return (saturationScore * brightnessScore).coerceIn(0f, 1f)
     }
 }

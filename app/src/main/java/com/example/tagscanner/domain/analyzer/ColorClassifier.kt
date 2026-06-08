@@ -3,73 +3,55 @@ package com.example.tagscanner.domain.analyzer
 import com.example.tagscanner.domain.model.ColorInterpretation
 import com.example.tagscanner.domain.model.ColorMeasurement
 import com.example.tagscanner.domain.model.InterpretationSeverity
+import com.example.tagscanner.domain.model.LabelProfile
 
 class ColorClassifier {
-    fun classify(measurement: ColorMeasurement): ColorInterpretation {
-        return when {
-            measurement.confidence < 0.40f -> {
-                ColorInterpretation(
-                    label = "Unclear",
-                    description = "The detected color is not reliable enough for interpretation.",
-                    severity = InterpretationSeverity.UNKNOWN
-                )
-            }
 
-            measurement.saturation < 0.15f -> {
-                ColorInterpretation(
-                    label = "Low saturation",
-                    description = "The detected area does not contain a strong color.",
-                    severity = InterpretationSeverity.UNKNOWN
-                )
-            }
+    fun classify(
+        measurement: ColorMeasurement,
+        profile: LabelProfile = LabelProfile.default()
+    ): ColorInterpretation {
+        // Quality guards — profile-independent
+        if (measurement.confidence < 0.40f) {
+            return ColorInterpretation(
+                label = "Unclear",
+                description = "The detected color is not reliable enough for interpretation.",
+                severity = InterpretationSeverity.UNKNOWN
+            )
+        }
+        if (measurement.saturation < 0.15f) {
+            return ColorInterpretation(
+                label = "Low saturation",
+                description = "The detected area does not contain a strong color.",
+                severity = InterpretationSeverity.UNKNOWN
+            )
+        }
+        if (measurement.value < 0.15f) {
+            return ColorInterpretation(
+                label = "Too dark",
+                description = "The detected area is too dark for reliable analysis.",
+                severity = InterpretationSeverity.UNKNOWN
+            )
+        }
 
-            measurement.value < 0.15f -> {
-                ColorInterpretation(
-                    label = "Too dark",
-                    description = "The detected area is too dark for reliable analysis.",
-                    severity = InterpretationSeverity.UNKNOWN
-                )
-            }
+        // Match hue against the active profile's rules
+        val hue = measurement.hue
+        val matchedRule = profile.colorRules.firstOrNull { rule ->
+            rule.hueRanges.any { range -> hue in range }
+        }
 
-            measurement.hue in 80f..160f -> {
-                ColorInterpretation(
-                    label = "Green",
-                    description = "Tag indicates normal state.",
-                    severity = InterpretationSeverity.NORMAL
-                )
-            }
-
-            measurement.hue in 35f..75f -> {
-                ColorInterpretation(
-                    label = "Yellow",
-                    description = "Tag indicates warning state.",
-                    severity = InterpretationSeverity.WARNING
-                )
-            }
-
-            measurement.hue in 0f..20f || measurement.hue in 340f..360f -> {
-                ColorInterpretation(
-                    label = "Red",
-                    description = "Tag indicates critical state.",
-                    severity = InterpretationSeverity.CRITICAL
-                )
-            }
-
-            measurement.hue in 200f..260f -> {
-                ColorInterpretation(
-                    label = "Blue",
-                    description = "Tag indicates blue state.",
-                    severity = InterpretationSeverity.NORMAL
-                )
-            }
-
-            else -> {
-                ColorInterpretation(
-                    label = "Unknown",
-                    description = "The detected color does not match a known tag state.",
-                    severity = InterpretationSeverity.UNKNOWN
-                )
-            }
+        return if (matchedRule != null) {
+            ColorInterpretation(
+                label = matchedRule.label,
+                description = matchedRule.description,
+                severity = matchedRule.severity
+            )
+        } else {
+            ColorInterpretation(
+                label = "Unknown",
+                description = "The detected color does not match any rule in the '${profile.displayName}' profile.",
+                severity = InterpretationSeverity.UNKNOWN
+            )
         }
     }
 }

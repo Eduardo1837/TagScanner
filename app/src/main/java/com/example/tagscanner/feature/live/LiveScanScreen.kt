@@ -40,6 +40,7 @@ import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.repository.ActiveScanDetailsRepository
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.ui.components.ActiveDetailsCompactCard
+import com.example.tagscanner.ui.components.ProfileSelectorRow
 import com.example.tagscanner.ui.components.ScannerSaveActions
 import com.example.tagscanner.ui.components.screenBackground
 import java.util.concurrent.Executors
@@ -246,6 +247,10 @@ private fun LiveScanHeader() {
             style = MaterialTheme.typography.labelSmall,
             color = Color(0xFF6B7280)
         )
+
+        Spacer(Modifier.height(8.dp))
+
+        ProfileSelectorRow()
     }
 }
 

@@ -11,6 +11,7 @@ import com.example.tagscanner.domain.model.RegionOfInterest
 import com.example.tagscanner.domain.model.RgbColor
 import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.model.ScanSource
+import com.example.tagscanner.domain.repository.ActiveLabelProfileRepository
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
 import com.example.tagscanner.processing.image.PreviewImageEncoder
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +64,7 @@ class LiveScanViewModel(
 
             val result = colorAnalyzer.analyzeColor(
                 rgbColor = sample,
+                labelProfile = ActiveLabelProfileRepository.currentProfile(),
                 regionOfInterest = RegionOfInterest(
                     x = (imageWidth - roiSize) / 2f,
                     y = (imageHeight - roiSize) / 2f,
