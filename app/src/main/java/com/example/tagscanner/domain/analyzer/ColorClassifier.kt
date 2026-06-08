@@ -11,17 +11,10 @@ class ColorClassifier {
         measurement: ColorMeasurement,
         profile: LabelProfile = LabelProfile.default()
     ): ColorInterpretation {
-        if (measurement.confidence < 0.40f) {
-            return ColorInterpretation(
-                label = "Unclear",
-                description = "The detected color is not reliable enough for interpretation.",
-                severity = InterpretationSeverity.UNKNOWN
-            )
-        }
-
-        // Profile rules are checked before generic quality guards so that rules
-        // that intentionally target low-saturation or low-value regions (e.g.
-        // Bromocresol Stage 3) are not swallowed by the fallback guards.
+        // Profile rules are always evaluated first. Confidence and generic
+        // quality guards are fallbacks — they must not gate out rules that
+        // intentionally target low-saturation or low-brightness regions
+        // (e.g. Bromocresol Stage 2/3/4 where sat×val is well below 0.40).
         val hue = measurement.hue
         val sat = measurement.saturation
         val value = measurement.value
@@ -41,7 +34,14 @@ class ColorClassifier {
             )
         }
 
-        // Generic quality guards — fallback when no profile rule matched
+        // Fallback quality guards — only reached when no rule matched
+        if (measurement.confidence < 0.40f) {
+            return ColorInterpretation(
+                label = "Unclear",
+                description = "The detected color is not reliable enough for interpretation.",
+                severity = InterpretationSeverity.UNKNOWN
+            )
+        }
         if (sat < 0.15f) {
             return ColorInterpretation(
                 label = "Low saturation",

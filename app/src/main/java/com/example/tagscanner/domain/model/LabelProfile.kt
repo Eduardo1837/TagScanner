@@ -84,7 +84,7 @@ sealed class LabelProfile(
             ),
             ColorRule(
                 hueRanges = listOf(100f..145f),
-                minSaturation = 0.30f,
+                minSaturation = 0.20f,
                 minValue = 0.20f,
                 maxValue = 0.50f,
                 label = "Degradare incipientă",
