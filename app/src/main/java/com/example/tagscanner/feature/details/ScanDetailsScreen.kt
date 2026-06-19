@@ -27,10 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.tagscanner.R
+import com.example.tagscanner.core.locale.ClassificationLocalizer
 import com.example.tagscanner.core.util.formatTimestamp
 import com.example.tagscanner.data.remote.storage.SupabaseImageStorage
 import com.example.tagscanner.domain.model.ScanDetails
@@ -63,8 +66,8 @@ fun ScanDetailsScreen(
 
     if(scan == null) {
         EmptyState(
-            title = "Scan not found",
-            description = uiState.errorMessage ?: "This scan could not be loaded"
+            title = stringResource(R.string.scan_details_not_found_title),
+            description = uiState.errorMessage ?: stringResource(R.string.scan_details_not_found_desc)
         )
     } else {
         ScanDetailsContent(
@@ -95,7 +98,7 @@ private fun ScanDetailsContent(
             .padding(16.dp)
     ) {
         Text(
-            text = "Scan Details",
+            text = stringResource(R.string.scan_details_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             color = Color(0xFF111827)
@@ -106,7 +109,7 @@ private fun ScanDetailsContent(
 
             AsyncImage(
                 model = imageUrl,
-                contentDescription = "Scan preview",
+                contentDescription = stringResource(R.string.scan_details_image_preview_desc),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(220.dp)
@@ -131,7 +134,7 @@ private fun ScanDetailsContent(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = scan.interpretation.label,
+                            text = ClassificationLocalizer.label(scan.interpretation.label),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF111827)
@@ -144,13 +147,13 @@ private fun ScanDetailsContent(
                         Spacer(Modifier.height(8.dp))
 
                         Text(
-                            text = "Quality: ${scan.qualityScore ?: 0}%",
+                            text = stringResource(R.string.scan_details_quality, scan.qualityScore ?: 0),
                             color = Color(0xFF6B7280),
                             style = MaterialTheme.typography.bodySmall
                         )
 
                         Text(
-                            text = "Confidence: ${(measurement.confidence * 100).toInt()}%",
+                            text = stringResource(R.string.scan_details_confidence, (measurement.confidence * 100).toInt()),
                             color = Color(0xFF6B7280),
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -161,49 +164,51 @@ private fun ScanDetailsContent(
 
         Spacer(Modifier.height(12.dp))
 
-        DetailsSection(title = "Scan Info") {
-            DetailRow("Timestamp", formatTimestamp(scan.timestampMillis))
+        val dash = stringResource(R.string.scan_details_placeholder_dash)
+
+        DetailsSection(title = stringResource(R.string.scan_details_section_scan_info)) {
+            DetailRow(stringResource(R.string.scan_details_timestamp), formatTimestamp(scan.timestampMillis))
             DetailRow(
-                "Source",
+                stringResource(R.string.scan_details_source),
                 when(scan.source) {
-                    ScanSource.LIVE_CAMERA -> "Live Camera"
-                    ScanSource.GALLERY_IMAGE -> "Gallery Image"
+                    ScanSource.LIVE_CAMERA -> stringResource(R.string.source_live_camera)
+                    ScanSource.GALLERY_IMAGE -> stringResource(R.string.source_gallery_image)
                 }
             )
         }
 
         Spacer(Modifier.height(12.dp))
 
-        DetailsSection(title="Product Details") {
-            DetailRow("Provider",details?.provider ?: "-")
-            DetailRow("Product", details?.product ?: "-")
-            DetailRow("Batch", details?.batch ?: "-")
-            DetailRow("Category", details?.category ?: "-")
-            DetailRow("Notes", scan.note ?: "-")
+        DetailsSection(title = stringResource(R.string.scan_details_section_product_details)) {
+            DetailRow(stringResource(R.string.scan_details_provider), details?.provider ?: dash)
+            DetailRow(stringResource(R.string.scan_details_product), details?.product ?: dash)
+            DetailRow(stringResource(R.string.scan_details_batch), details?.batch ?: dash)
+            DetailRow(stringResource(R.string.scan_details_category), details?.category ?: dash)
+            DetailRow(stringResource(R.string.scan_details_notes), scan.note ?: dash)
         }
 
         Spacer(Modifier.height(12.dp))
 
-        DetailsSection(title = "Color Values") {
-            DetailRow("RGB", "${measurement.red}, ${measurement.green}, ${measurement.blue}")
+        DetailsSection(title = stringResource(R.string.scan_details_section_color_values)) {
+            DetailRow(stringResource(R.string.scan_details_rgb), "${measurement.red}, ${measurement.green}, ${measurement.blue}")
             DetailRow(
-                "HSV",
+                stringResource(R.string.scan_details_hsv),
                 "${measurement.hue.toInt()}, ${measurement.saturation}, ${measurement.value}"
             )
         }
 
         Spacer(Modifier.height(12.dp))
 
-        DetailsSection(title="Region Of Interest") {
+        DetailsSection(title = stringResource(R.string.scan_details_section_roi)) {
             val roi = scan.regionOfInterest
 
             if(roi == null) {
-                DetailRow("ROI", "-")
+                DetailRow(stringResource(R.string.scan_details_roi), dash)
             } else {
-                DetailRow("X", roi.x.toString())
-                DetailRow("Y", roi.y.toString())
-                DetailRow("Width",roi.width.toString())
-                DetailRow("Height", roi.height.toString())
+                DetailRow(stringResource(R.string.scan_details_roi_x), roi.x.toString())
+                DetailRow(stringResource(R.string.scan_details_roi_y), roi.y.toString())
+                DetailRow(stringResource(R.string.scan_details_roi_width), roi.width.toString())
+                DetailRow(stringResource(R.string.scan_details_roi_height), roi.height.toString())
             }
         }
 
@@ -216,7 +221,7 @@ private fun ScanDetailsContent(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Edit details")
+            Text(stringResource(R.string.scan_details_edit))
         }
 
         Spacer(Modifier.height(8.dp))
@@ -226,7 +231,10 @@ private fun ScanDetailsContent(
             enabled = !isDeleting,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(if (isDeleting) "Deleting..." else "Delete Scan")
+            Text(
+                if (isDeleting) stringResource(R.string.scan_details_deleting)
+                else stringResource(R.string.scan_details_delete)
+            )
         }
 
         Spacer(Modifier.height(8.dp))
@@ -235,7 +243,7 @@ private fun ScanDetailsContent(
             onClick = onBackClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Back")
+            Text(stringResource(R.string.scan_details_back))
         }
     }
 }

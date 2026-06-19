@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import com.example.tagscanner.R
 import com.example.tagscanner.core.navigation.Route
 
 private val ActiveBlue = Color(0xFF2563EB)
@@ -31,11 +33,11 @@ fun BottomNavBar(
     onItemClick: (Route) -> Unit
 ) {
     val items = listOf(
-        BottomNavItem(Route.Home, "Home", Icons.Filled.Home),
-        BottomNavItem(Route.LiveScan, "Live Scan", Icons.Filled.CameraAlt),
-        BottomNavItem(Route.GalleryScan, "Gallery", Icons.Filled.Image),
-        BottomNavItem(Route.Dashboard, "Dashboard", Icons.Filled.BarChart),
-        BottomNavItem(Route.History, "History", Icons.Filled.History)
+        BottomNavItem(Route.Home, stringResource(R.string.nav_home), Icons.Filled.Home),
+        BottomNavItem(Route.LiveScan, stringResource(R.string.nav_live_scan), Icons.Filled.CameraAlt),
+        BottomNavItem(Route.GalleryScan, stringResource(R.string.nav_gallery), Icons.Filled.Image),
+        BottomNavItem(Route.Dashboard, stringResource(R.string.nav_dashboard), Icons.Filled.BarChart),
+        BottomNavItem(Route.History, stringResource(R.string.nav_history), Icons.Filled.History)
     )
 
     NavigationBar(

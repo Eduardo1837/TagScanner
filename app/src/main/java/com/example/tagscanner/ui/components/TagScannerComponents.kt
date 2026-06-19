@@ -15,9 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.tagscanner.R
+import com.example.tagscanner.core.locale.ClassificationLocalizer
 import com.example.tagscanner.core.util.formatTimestamp
 import com.example.tagscanner.domain.model.InterpretationSeverity
 import com.example.tagscanner.domain.model.ScanResult
@@ -87,22 +90,22 @@ fun StatusBadge(severity: InterpretationSeverity) {
         InterpretationSeverity.NORMAL -> {
             background = Color(0xFFDCFCE7)
             foreground = Color(0xFF166534)
-            label = "Normal"
+            label = stringResource(R.string.severity_normal)
         }
         InterpretationSeverity.WARNING -> {
             background = Color(0xFFFEF3C7)
             foreground = Color(0xFF92400E)
-            label = "Warning"
+            label = stringResource(R.string.severity_warning)
         }
         InterpretationSeverity.CRITICAL -> {
             background = Color(0xFFFEE2E2)
             foreground = Color(0xFF991B1B)
-            label = "Critical"
+            label = stringResource(R.string.severity_critical)
         }
         InterpretationSeverity.UNKNOWN -> {
             background = Color(0xFFF3F4F6)
             foreground = Color(0xFF374151)
-            label = "Unknown"
+            label = stringResource(R.string.severity_unknown)
         }
     }
 
@@ -131,8 +134,8 @@ fun ScanCard(
     val details = scan.details
 
     val sourceLabel = when (scan.source) {
-        ScanSource.LIVE_CAMERA -> "Live Camera"
-        ScanSource.GALLERY_IMAGE -> "Gallery Image"
+        ScanSource.LIVE_CAMERA -> stringResource(R.string.source_live_camera)
+        ScanSource.GALLERY_IMAGE -> stringResource(R.string.source_gallery_image)
     }
 
     val sourceIcon = when (scan.source) {
@@ -140,7 +143,7 @@ fun ScanCard(
         ScanSource.GALLERY_IMAGE -> Icons.Filled.Image
     }
 
-    val title = details?.provider ?: scan.interpretation.label
+    val title = details?.provider ?: ClassificationLocalizer.label(scan.interpretation.label)
     val subtitle = if (details != null) {
         "${details.product} • ${details.batch}"
     } else {
@@ -191,7 +194,11 @@ fun ScanCard(
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    text = "Quality: $qualityText • Confidence: ${(measurement.confidence * 100).toInt()}%",
+                    text = stringResource(
+                        R.string.quality_confidence_inline,
+                        qualityText,
+                        "${(measurement.confidence * 100).toInt()}%"
+                    ),
                     color = Color(0xFF6B7280),
                     style = MaterialTheme.typography.labelSmall
                 )
@@ -268,14 +275,14 @@ fun ActiveDetailsCompactCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Active Details",
+                    text = stringResource(R.string.active_details_title),
                     color = Color(0xFF111827),
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.labelMedium
                 )
 
                 Text(
-                    text = "Clear",
+                    text = stringResource(R.string.action_clear),
                     color = Color(0xFF2563EB),
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.labelSmall,
@@ -286,7 +293,12 @@ fun ActiveDetailsCompactCard(
             Spacer(Modifier.height(4.dp))
 
             Text(
-                text = "${details.provider} - ${details.product} - ${details.batch}",
+                text = stringResource(
+                    R.string.active_details_summary,
+                    details.provider,
+                    details.product,
+                    details.batch
+                ),
                 color = Color(0xFF374151),
                 style = MaterialTheme.typography.labelSmall
             )
@@ -310,7 +322,7 @@ fun ScannerSaveActions(
                     .fillMaxWidth()
                     .height(54.dp)
             ) {
-                Text("Save result")
+                Text(stringResource(R.string.save_result))
             }
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -320,7 +332,7 @@ fun ScannerSaveActions(
                         .weight(1f)
                         .height(54.dp)
                 ) {
-                    Text("Save with current")
+                    Text(stringResource(R.string.save_with_current))
                 }
 
                 OutlinedButton(
@@ -329,7 +341,7 @@ fun ScannerSaveActions(
                         .weight(1f)
                         .height(54.dp)
                 ) {
-                    Text("Save with new")
+                    Text(stringResource(R.string.save_with_new))
                 }
             }
         }

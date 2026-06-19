@@ -33,11 +33,14 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tagscanner.R
+import com.example.tagscanner.core.locale.ClassificationLocalizer
 import com.example.tagscanner.domain.model.AnalysisResult
 import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.repository.ActiveScanDetailsRepository
@@ -115,7 +118,7 @@ fun LiveScanScreen(
                     )
                 } else {
                     Text(
-                        text = if (uiState.isAnalyzing) "Analyzing..." else "Align the tag inside the frame",
+                        text = if (uiState.isAnalyzing) stringResource(R.string.live_scan_analyzing) else stringResource(R.string.live_scan_align_tag),
                         color = Color.White.copy(alpha = 0.78f),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier
@@ -233,7 +236,7 @@ private fun CameraPreview(
                         imageAnalysis
                     )
                 } catch (exception: Exception) {
-                    viewModel.onCameraError("Camera could not be started.")
+                    viewModel.onCameraError(context.getString(R.string.live_scan_camera_error))
                 }
             },
             ContextCompat.getMainExecutor(context)
@@ -255,14 +258,14 @@ private fun LiveScanHeader() {
             .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
         Text(
-            text = "Live Scan",
+            text = stringResource(R.string.live_scan_title),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             color = Color(0xFF111827)
         )
 
         Text(
-            text = "Align the tag inside the frame",
+            text = stringResource(R.string.live_scan_align_tag),
             style = MaterialTheme.typography.labelSmall,
             color = Color(0xFF6B7280)
         )
@@ -287,7 +290,7 @@ private fun PermissionState(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Camera access is required for live scanning.",
+            text = stringResource(R.string.live_scan_camera_required),
             color = Color.White,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -295,7 +298,7 @@ private fun PermissionState(
         Spacer(Modifier.height(16.dp))
 
         Button(onClick = onGrantClick) {
-            Text("Grant camera permission")
+            Text(stringResource(R.string.live_scan_grant_permission))
         }
     }
 }
@@ -348,7 +351,11 @@ private fun ScanResultOverlay(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${result.interpretation.label} / ${result.interpretation.severity.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                    text = stringResource(
+                        R.string.live_scan_label_severity,
+                        ClassificationLocalizer.label(result.interpretation.label),
+                        ClassificationLocalizer.severityLabel(result.interpretation.severity)
+                    ),
                     color = Color(0xFF111827),
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.bodyMedium
@@ -358,13 +365,13 @@ private fun ScanResultOverlay(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text(
-                        text = "Quality: $quality%",
+                        text = stringResource(R.string.live_scan_quality, quality),
                         color = Color(0xFF6B7280),
                         style = MaterialTheme.typography.labelSmall
                     )
 
                     Text(
-                        text = "Confidence: $confidence%",
+                        text = stringResource(R.string.live_scan_confidence, confidence),
                         color = Color(0xFF6B7280),
                         style = MaterialTheme.typography.labelSmall
                     )
@@ -431,7 +438,7 @@ private fun LiveScanBottomActions(
                     .fillMaxWidth()
                     .height(54.dp)
             ) {
-                Text("Waiting for detection")
+                Text(stringResource(R.string.live_scan_waiting_for_detection))
             }
         }
     }
@@ -456,7 +463,7 @@ private fun SavedFeedbackBanner(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Scan saved successfully",
+                text = stringResource(R.string.live_scan_saved),
                 color = Color.White,
                 fontWeight = FontWeight.Medium,
                 style = MaterialTheme.typography.bodyMedium

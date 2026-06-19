@@ -20,9 +20,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tagscanner.R
 import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.ui.components.EmptyState
 import com.example.tagscanner.ui.components.ScanCard
@@ -143,9 +145,9 @@ private fun HistoryContent(
             Icon(
                 imageVector = Icons.Filled.FilterList,
                 contentDescription = if (showAdvancedFilters) {
-                    "Hide Filters"
+                    stringResource(R.string.history_hide_filters)
                 } else {
-                    "Show Filters"
+                    stringResource(R.string.history_show_filters)
                 },
                 tint = if (showAdvancedFilters) {
                     Color(0xFF2563EB)
@@ -167,7 +169,7 @@ private fun HistoryContent(
                 }
 
                 FilterChip(
-                    label = "${filter.label} ($count)",
+                    label = stringResource(R.string.history_filter_count, historyFilterLabel(filter), count),
                     selected = uiState.selectedFilter == filter,
                     onClick = { onFilterSelected(filter) }
                 )
@@ -179,7 +181,7 @@ private fun HistoryContent(
             Spacer(Modifier.height(8.dp))
 
             DynamicFilterRow(
-                title = "Provider",
+                title = stringResource(R.string.history_filter_provider),
                 values = providers,
                 selectedValue = uiState.selectedProvider,
                 onSelected = onProviderSelected
@@ -188,7 +190,7 @@ private fun HistoryContent(
             Spacer(Modifier.height(8.dp))
 
             DynamicFilterRow(
-                title = "Product",
+                title = stringResource(R.string.history_filter_product),
                 values = products,
                 selectedValue = uiState.selectedProduct,
                 onSelected = onProductSelected
@@ -197,7 +199,7 @@ private fun HistoryContent(
             Spacer(Modifier.height(8.dp))
 
             DynamicFilterRow(
-                title = "Batch",
+                title = stringResource(R.string.history_filter_batch),
                 values = batches,
                 selectedValue = uiState.selectedBatch,
                 onSelected = onBatchSelected
@@ -208,11 +210,11 @@ private fun HistoryContent(
 
         if(filteredScans.isEmpty()){
             EmptyState(
-                title = "No scans found",
+                title = stringResource(R.string.history_empty_title),
                 description = if (uiState.selectedFilter == HistoryFilter.All && uiState.searchQuery.isBlank()) {
-                    "No scans saved yet."
+                    stringResource(R.string.history_empty_desc_no_scans)
                 } else {
-                    "No scans match your filters"
+                    stringResource(R.string.history_empty_desc_no_match)
                 }
             )
         } else {
@@ -243,7 +245,7 @@ private fun SearchField(
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
         placeholder = {
-            Text("Search scans...")
+            Text(stringResource(R.string.history_search_placeholder))
         },
         leadingIcon = {
             Icon(
@@ -311,7 +313,7 @@ private fun DynamicFilterRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             FilterChip(
-                label = "All",
+                label = stringResource(R.string.history_filter_all),
                 selected = selectedValue == null,
                 onClick = {onSelected(null)}
             )
@@ -325,5 +327,14 @@ private fun DynamicFilterRow(
             }
         }
     }
+}
+
+@Composable
+private fun historyFilterLabel(filter: HistoryFilter): String = when (filter) {
+    HistoryFilter.All -> stringResource(R.string.history_filter_label_all)
+    HistoryFilter.Normal -> stringResource(R.string.history_filter_label_normal)
+    HistoryFilter.Warning -> stringResource(R.string.history_filter_label_warning)
+    HistoryFilter.Critical -> stringResource(R.string.history_filter_label_critical)
+    HistoryFilter.Unknown -> stringResource(R.string.history_filter_label_unknown)
 }
 

@@ -1,8 +1,10 @@
 package com.example.tagscanner.feature.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
@@ -13,12 +15,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.tagscanner.R
+import com.example.tagscanner.core.locale.AppLanguage
+import com.example.tagscanner.core.locale.LocaleManager
 import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.ui.components.EmptyState
 import com.example.tagscanner.ui.components.ScanCard
@@ -40,17 +49,25 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Text(
-            text = "Tag Scanner",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF111827)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.home_title),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF111827)
+            )
+
+            LanguageToggle()
+        }
 
         Spacer(Modifier.height(4.dp))
 
         Text(
-            text = "Scan color-changing tags and track product quality by provider, product, and batch.",
+            text = stringResource(R.string.home_subtitle),
             color = Color(0xFF6B7280),
             style = MaterialTheme.typography.bodySmall
         )
@@ -59,14 +76,14 @@ fun HomeScreen(
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             HomeActionCard(
-                title = "Live Scan",
+                title = stringResource(R.string.home_action_live_scan),
                 icon = Icons.Filled.CameraAlt,
                 onClick = onLiveScanClick,
                 modifier = Modifier.weight(1f)
             )
 
             HomeActionCard(
-                title = "Pick Image",
+                title = stringResource(R.string.home_action_pick_image),
                 icon = Icons.Filled.Image,
                 onClick = onGalleryScanClick,
                 modifier = Modifier.weight(1f)
@@ -84,7 +101,7 @@ fun HomeScreen(
         Spacer(Modifier.height(20.dp))
 
         Text(
-            text = "Dashboard Preview",
+            text = stringResource(R.string.home_dashboard_preview),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             color = Color(0xFF111827)
@@ -94,20 +111,20 @@ fun HomeScreen(
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PreviewStatCard("Total Scans", uiState.totalScans.toString(), Color(0xFF111827), Modifier.weight(1f))
-                PreviewStatCard("Avg Quality", "${uiState.averageQuality}%", Color(0xFF16A34A), Modifier.weight(1f))
+                PreviewStatCard(stringResource(R.string.home_stat_total_scans), uiState.totalScans.toString(), Color(0xFF111827), Modifier.weight(1f))
+                PreviewStatCard(stringResource(R.string.home_stat_avg_quality), "${uiState.averageQuality}%", Color(0xFF16A34A), Modifier.weight(1f))
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PreviewStatCard("Best Provider", uiState.bestProvider ?: "-", Color(0xFF111827), Modifier.weight(1f))
-                PreviewStatCard("Critical Scans", uiState.criticalScans.toString(), Color(0xFFDC2626), Modifier.weight(1f))
+                PreviewStatCard(stringResource(R.string.home_stat_best_provider), uiState.bestProvider ?: "-", Color(0xFF111827), Modifier.weight(1f))
+                PreviewStatCard(stringResource(R.string.home_stat_critical_scans), uiState.criticalScans.toString(), Color(0xFFDC2626), Modifier.weight(1f))
             }
         }
 
         Spacer(Modifier.height(20.dp))
 
         Text(
-            text = "Recent Scans",
+            text = stringResource(R.string.home_recent_scans),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             color = Color(0xFF111827)
@@ -117,8 +134,8 @@ fun HomeScreen(
 
         if (uiState.recentScans.isEmpty()) {
             EmptyState(
-                title = "No scans saved yet",
-                description = "Start scanning tags to build your scan history"
+                title = stringResource(R.string.home_empty_title),
+                description = stringResource(R.string.home_empty_desc)
             )
         } else {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -129,6 +146,33 @@ fun HomeScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun LanguageToggle(modifier: Modifier = Modifier) {
+    val current by LocaleManager.currentLanguage.collectAsState()
+
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color(0xFFF3F4F6)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AppLanguage.entries.forEach { language ->
+            val selected = language == current
+            Text(
+                text = language.tag.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                color = if (selected) Color.White else Color(0xFF6B7280),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(if (selected) Color(0xFF2563EB) else Color.Transparent)
+                    .clickable { LocaleManager.setLanguage(language) }
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            )
         }
     }
 }
@@ -192,14 +236,14 @@ private fun ActiveDetailsPreview(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Active Scan Details",
+                    text = stringResource(R.string.home_active_details),
                     color = Color(0xFF111827),
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.bodyMedium
                 )
 
                 Text(
-                    text = "Clear",
+                    text = stringResource(R.string.home_clear),
                     color = Color(0xFF2563EB),
                     fontWeight = FontWeight.Medium,
                     style = MaterialTheme.typography.labelMedium,
@@ -209,12 +253,12 @@ private fun ActiveDetailsPreview(
 
             Spacer(Modifier.height(8.dp))
 
-            Text("Provider: ${details.provider}", color = Color(0xFF374151), style = MaterialTheme.typography.bodySmall)
-            Text("Product: ${details.product}", color = Color(0xFF374151), style = MaterialTheme.typography.bodySmall)
-            Text("Batch: ${details.batch}", color = Color(0xFF374151), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.home_provider, details.provider), color = Color(0xFF374151), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.home_product, details.product), color = Color(0xFF374151), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.home_batch, details.batch), color = Color(0xFF374151), style = MaterialTheme.typography.bodySmall)
 
             details.category?.let {
-                Text("Category: $it", color = Color(0xFF374151), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.home_category, it), color = Color(0xFF374151), style = MaterialTheme.typography.bodySmall)
             }
         }
     }

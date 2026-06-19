@@ -18,11 +18,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.tagscanner.R
+import com.example.tagscanner.core.locale.ClassificationLocalizer
 import com.example.tagscanner.domain.model.LabelProfile
 import com.example.tagscanner.domain.repository.ActiveLabelProfileRepository
 
@@ -84,7 +86,7 @@ fun ProfileSelectorRow(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Category:",
+            text = stringResource(R.string.profile_selector_category),
             style = MaterialTheme.typography.labelSmall,
             color = Color(0xFF6B7280)
         )
@@ -110,14 +112,14 @@ fun ProfileSelectorRow(modifier: Modifier = Modifier) {
                 modifier = Modifier.size(14.dp)
             )
             Text(
-                text = activeProfile.displayName,
+                text = ClassificationLocalizer.profileDisplayName(activeProfile),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = activeProfile.accentColor
             )
             Icon(
                 imageVector = Icons.Filled.ExpandMore,
-                contentDescription = "Change category",
+                contentDescription = stringResource(R.string.profile_selector_change_category),
                 tint = activeProfile.accentColor,
                 modifier = Modifier
                     .size(16.dp)
@@ -167,14 +169,14 @@ private fun ProfilePickerDialog(
                 ) {
                     // Header
                     Text(
-                        text = "Product Type",
+                        text = stringResource(R.string.profile_selector_product_type),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF111827)
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Select the category of the scanned product",
+                        text = stringResource(R.string.profile_selector_select_category),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF6B7280)
                     )
@@ -257,7 +259,7 @@ private fun ProfileCard(
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = profile.displayName,
+                text = ClassificationLocalizer.profileDisplayName(profile),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                 color = contentColor,

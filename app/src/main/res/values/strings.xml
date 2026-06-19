@@ -1,3 +1,234 @@
 <resources>
     <string name="app_name">TagScanner</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_live_scan">Live Scan</string>
+    <string name="nav_gallery">Gallery</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_history">History</string>
+
+    <!-- Home screen -->
+    <string name="home_title">Tag Scanner</string>
+    <string name="home_subtitle">Scan color-changing tags and track product quality by provider, product, and batch.</string>
+    <string name="home_action_live_scan">Live Scan</string>
+    <string name="home_action_pick_image">Pick Image</string>
+    <string name="home_dashboard_preview">Dashboard Preview</string>
+    <string name="home_stat_total_scans">Total Scans</string>
+    <string name="home_stat_avg_quality">Avg Quality</string>
+    <string name="home_stat_best_provider">Best Provider</string>
+    <string name="home_stat_critical_scans">Critical Scans</string>
+    <string name="home_recent_scans">Recent Scans</string>
+    <string name="home_empty_title">No scans saved yet</string>
+    <string name="home_empty_desc">Start scanning tags to build your scan history</string>
+    <string name="home_active_details">Active Scan Details</string>
+    <string name="home_clear">Clear</string>
+    <string name="home_provider">Provider: %1$s</string>
+    <string name="home_product">Product: %1$s</string>
+    <string name="home_batch">Batch: %1$s</string>
+    <string name="home_category">Category: %1$s</string>
+
+    <!-- Profile selector -->
+    <string name="profile_selector_category">Category:</string>
+    <string name="profile_selector_change_category">Change category</string>
+    <string name="profile_selector_product_type">Product Type</string>
+    <string name="profile_selector_select_category">Select the category of the scanned product</string>
+
+    <!-- Label profile display names -->
+    <string name="profile_dairy">Dairy Products</string>
+    <string name="profile_fish">Fish &amp; Seafood</string>
+    <string name="profile_red_meat">Red Meat</string>
+    <string name="profile_poultry">Poultry</string>
+
+    <!-- Classification stage labels (shared across all profiles) -->
+    <string name="label_fresh">Fresh</string>
+    <string name="label_early_spoilage">Early Spoilage</string>
+    <string name="label_advanced_spoilage">Advanced Spoilage</string>
+    <string name="label_spoiled">Spoiled</string>
+    <string name="label_unclear">Unclear</string>
+    <string name="label_low_saturation">Low saturation</string>
+    <string name="label_too_dark">Too dark</string>
+    <string name="label_unknown">Unknown</string>
+
+    <!-- Classification stage descriptions, per profile -->
+    <string name="desc_dairy_fresh">Fresh product. Minimal lactic acid buildup.</string>
+    <string name="desc_dairy_early">Onset of bacterial fermentation. Consume as soon as possible.</string>
+    <string name="desc_dairy_advanced">Significant bacterial activity. Product not recommended.</string>
+    <string name="desc_dairy_spoiled">Product is no longer safe for consumption.</string>
+
+    <string name="desc_fish_fresh">Fresh product. Minimal level of volatile amines.</string>
+    <string name="desc_fish_early">Slight increase in volatile amines. Consume as soon as possible.</string>
+    <string name="desc_fish_advanced">High level of ammonia and trimethylamine. Product not recommended.</string>
+    <string name="desc_fish_spoiled">Product completely spoiled. Do not consume.</string>
+
+    <string name="desc_meat_fresh">Fresh meat. Normal pH, biogenic amines absent.</string>
+    <string name="desc_meat_early">Slight pH increase from packaging. Consume the same day.</string>
+    <string name="desc_meat_advanced">Significant level of biogenic amines. Product not recommended.</string>
+    <string name="desc_meat_spoiled">Meat completely spoiled. Do not consume.</string>
+
+    <string name="desc_poultry_fresh">Fresh meat. Undetectable level of biogenic amines.</string>
+    <string name="desc_poultry_early">Traces of putrescine/cadaverine detected. Consume soon.</string>
+    <string name="desc_poultry_advanced">High concentration of biogenic amines. Product not recommended.</string>
+    <string name="desc_poultry_spoiled">Meat completely spoiled. Do not consume.</string>
+
+    <!-- Live scan -->
+    <string name="live_scan_saved">Scan saved successfully</string>
+    <string name="live_scan_title">Live Scan</string>
+    <string name="live_scan_align_tag">Align the tag inside the frame</string>
+    <string name="live_scan_analyzing">Analyzing...</string>
+    <string name="live_scan_camera_required">Camera access is required for live scanning.</string>
+    <string name="live_scan_grant_permission">Grant camera permission</string>
+    <string name="live_scan_camera_error">Camera could not be started.</string>
+    <string name="live_scan_waiting_for_detection">Waiting for detection</string>
+    <string name="live_scan_quality">Quality: %1$d%%</string>
+    <string name="live_scan_confidence">Confidence: %1$d%%</string>
+    <string name="live_scan_label_severity">%1$s / %2$s</string>
+
+    <!-- Status badge severities -->
+    <string name="severity_normal">Normal</string>
+    <string name="severity_warning">Warning</string>
+    <string name="severity_critical">Critical</string>
+    <string name="severity_unknown">Unknown</string>
+
+    <!-- Scan source -->
+    <string name="source_live_camera">Live Camera</string>
+    <string name="source_gallery_image">Gallery Image</string>
+
+    <!-- Shared components -->
+    <string name="active_details_title">Active Details</string>
+    <string name="action_clear">Clear</string>
+    <string name="active_details_summary">%1$s - %2$s - %3$s</string>
+    <string name="save_result">Save result</string>
+    <string name="save_with_current">Save with current</string>
+    <string name="save_with_new">Save with new</string>
+    <string name="quality_confidence_inline">Quality: %1$s • Confidence: %2$s</string>
+
+    <!-- Dashboard screen -->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="dashboard_no_scan_data_title">No scan data</string>
+    <string name="dashboard_no_scan_data_desc">Scan tags to see dashboard insights</string>
+    <string name="dashboard_stat_total_scans">Total Scans</string>
+    <string name="dashboard_stat_avg_quality">Avg Quality</string>
+    <string name="dashboard_stat_best_provider">Best Provider</string>
+    <string name="dashboard_stat_critical_rate">Critical Rate</string>
+    <string name="dashboard_stat_best_provider_placeholder">-</string>
+    <string name="dashboard_latest_scan">Latest Scan</string>
+    <string name="dashboard_confidence">Confidence: %1$d%%</string>
+    <string name="dashboard_quality_trend">Quality Trend</string>
+    <string name="dashboard_no_trend_data">No trend data available</string>
+    <string name="dashboard_trend_improving">Quality improving over time</string>
+    <string name="dashboard_trend_declining">Quality declining over time</string>
+    <string name="dashboard_trend_stable">Quality stable over time</string>
+    <string name="dashboard_distribution">Distribution</string>
+    <string name="dashboard_distribution_normal">Normal</string>
+    <string name="dashboard_distribution_warning">Warning</string>
+    <string name="dashboard_distribution_critical">Critical</string>
+    <string name="dashboard_provider_comparison">Provider Comparison</string>
+    <string name="dashboard_no_provider_data">No provider data available</string>
+    <string name="dashboard_provider_summary">%1$d scans • %2$d normal • %3$d warning • %4$d critical</string>
+    <string name="dashboard_batch_comparison">Batch Comparison</string>
+    <string name="dashboard_no_batch_data">No batch data available</string>
+    <string name="dashboard_batch_summary">%1$d warnings • %2$d critical</string>
+    <string name="dashboard_recent_problematic_scans">Recent Problematic Scans</string>
+    <string name="dashboard_no_warning_critical_scans">No warning or critical scans</string>
+    <string name="dashboard_unknown_provider">Unknown provider</string>
+    <string name="dashboard_filter_provider">Provider</string>
+    <string name="dashboard_filter_product_category">Product / Category</string>
+    <string name="dashboard_filter_all">All</string>
+    <string name="dashboard_search_placeholder">Search...</string>
+    <string name="dashboard_filter_label_value">%1$s: %2$s</string>
+    <string name="dashboard_time_today">Today</string>
+    <string name="dashboard_time_last_7_days">Last 7 days</string>
+    <string name="dashboard_time_last_30_days">Last 30 days</string>
+    <string name="dashboard_time_all_time">All time</string>
+
+    <!-- Scan details screen -->
+    <string name="scan_details_title">Scan Details</string>
+    <string name="scan_details_not_found_title">Scan not found</string>
+    <string name="scan_details_not_found_desc">This scan could not be loaded</string>
+    <string name="scan_details_image_preview_desc">Scan preview</string>
+    <string name="scan_details_quality">Quality: %1$d%%</string>
+    <string name="scan_details_confidence">Confidence: %1$d%%</string>
+    <string name="scan_details_section_scan_info">Scan Info</string>
+    <string name="scan_details_timestamp">Timestamp</string>
+    <string name="scan_details_source">Source</string>
+    <string name="scan_details_section_product_details">Product Details</string>
+    <string name="scan_details_provider">Provider</string>
+    <string name="scan_details_product">Product</string>
+    <string name="scan_details_batch">Batch</string>
+    <string name="scan_details_category">Category</string>
+    <string name="scan_details_notes">Notes</string>
+    <string name="scan_details_section_color_values">Color Values</string>
+    <string name="scan_details_rgb">RGB</string>
+    <string name="scan_details_hsv">HSV</string>
+    <string name="scan_details_section_roi">Region Of Interest</string>
+    <string name="scan_details_roi">ROI</string>
+    <string name="scan_details_roi_x">X</string>
+    <string name="scan_details_roi_y">Y</string>
+    <string name="scan_details_roi_width">Width</string>
+    <string name="scan_details_roi_height">Height</string>
+    <string name="scan_details_placeholder_dash">-</string>
+    <string name="scan_details_edit">Edit details</string>
+    <string name="scan_details_deleting">Deleting...</string>
+    <string name="scan_details_delete">Delete Scan</string>
+    <string name="scan_details_back">Back</string>
+
+    <!-- Gallery scan screen -->
+    <string name="gallery_scan_title">Gallery Scan</string>
+    <string name="gallery_scan_subtitle">Pick an image and analyze the tag color</string>
+    <string name="gallery_scan_no_image_selected">No image selected</string>
+    <string name="gallery_scan_selected_image_desc">Selected image</string>
+    <string name="gallery_scan_quality">Quality: %1$s%%</string>
+    <string name="gallery_scan_confidence">Confidence: %1$d%%</string>
+    <string name="gallery_scan_label_severity">%1$s / %2$s</string>
+    <string name="gallery_scan_pick_image">Pick image</string>
+    <string name="gallery_scan_choose_another_photo">Choose another photo</string>
+
+    <!-- History screen -->
+    <string name="history_search_placeholder">Search scans...</string>
+    <string name="history_hide_filters">Hide Filters</string>
+    <string name="history_show_filters">Show Filters</string>
+    <string name="history_filter_count">%1$s (%2$d)</string>
+    <string name="history_filter_provider">Provider</string>
+    <string name="history_filter_product">Product</string>
+    <string name="history_filter_batch">Batch</string>
+    <string name="history_filter_all">All</string>
+    <string name="history_empty_title">No scans found</string>
+    <string name="history_empty_desc_no_scans">No scans saved yet.</string>
+    <string name="history_empty_desc_no_match">No scans match your filters</string>
+    <string name="history_filter_label_all">All</string>
+    <string name="history_filter_label_normal">Normal</string>
+    <string name="history_filter_label_warning">Warning</string>
+    <string name="history_filter_label_critical">Critical</string>
+    <string name="history_filter_label_unknown">Unknown</string>
+
+    <!-- Save scan details screen -->
+    <string name="save_scan_title">Save Scan Details</string>
+    <string name="save_scan_provider_label">Provider *</string>
+    <string name="save_scan_provider_placeholder">Enter provider name</string>
+    <string name="save_scan_product_label">Product *</string>
+    <string name="save_scan_product_placeholder">Enter product name</string>
+    <string name="save_scan_batch_label">Batch Code *</string>
+    <string name="save_scan_batch_placeholder">Enter batch code</string>
+    <string name="save_scan_category_label">Category</string>
+    <string name="save_scan_notes_label">Notes</string>
+    <string name="save_scan_notes_placeholder">Optional notes</string>
+    <string name="save_scan_recent_suggestions">Recent Suggestions</string>
+    <string name="save_scan_save_button">Save scan</string>
+    <string name="save_scan_cancel_button">Cancel</string>
+    <string name="save_scan_no_result">No scan result</string>
+    <string name="save_scan_status_label_severity">%1$s / %2$s</string>
+    <string name="save_scan_quality_confidence">Quality: %1$s • Confidence: %2$s</string>
+    <string name="save_scan_default_confidence">91%%</string>
+    <string name="save_scan_dash">-</string>
+
+    <!-- Reuse details dialog -->
+    <string name="reuse_dialog_title">Reuse these details?</string>
+    <string name="reuse_dialog_message">Use this provider, product, and batch for the next scans?</string>
+    <string name="reuse_dialog_provider">Provider: %1$s</string>
+    <string name="reuse_dialog_product">Product: %1$s</string>
+    <string name="reuse_dialog_batch">Batch: %1$s</string>
+    <string name="reuse_dialog_category">Category: %1$s</string>
+    <string name="reuse_dialog_confirm">Yes, reuse</string>
+    <string name="reuse_dialog_dismiss">No, only this scan</string>
 </resources>

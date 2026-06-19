@@ -1,12 +1,14 @@
 package com.example.tagscanner.feature.gallery
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tagscanner.domain.analyzer.ColorAnalyzer
 import com.example.tagscanner.domain.analyzer.ColorAnalyzerImpl
 import com.example.tagscanner.domain.model.PendingScan
+import com.example.tagscanner.domain.model.RegionOfInterest
 import com.example.tagscanner.domain.model.ScanDetails
 import com.example.tagscanner.domain.model.ScanSource
 import com.example.tagscanner.domain.repository.ActiveLabelProfileRepository
@@ -64,6 +66,41 @@ class GalleryScanViewModel(
         analyzeUri(uri)
     }
 
+    fun onRoiChanged(fraction: Float, offsetXFraction: Float, offsetYFraction: Float) {
+        val clampedFraction = fraction.coerceIn(MIN_ROI_FRACTION, MAX_ROI_FRACTION)
+        val clampedOffsetX = offsetXFraction.coerceIn(-MAX_OFFSET_FRACTION, MAX_OFFSET_FRACTION)
+        val clampedOffsetY = offsetYFraction.coerceIn(-MAX_OFFSET_FRACTION, MAX_OFFSET_FRACTION)
+        val current = _uiState.value
+        if (clampedFraction == current.roiFraction &&
+            clampedOffsetX == current.roiOffsetXFraction &&
+            clampedOffsetY == current.roiOffsetYFraction
+        ) return
+
+        _uiState.value = current.copy(
+            roiFraction = clampedFraction,
+            roiOffsetXFraction = clampedOffsetX,
+            roiOffsetYFraction = clampedOffsetY
+        )
+
+        if (current.selectedImageUri != null) {
+            reAnalyzeCurrentImage()
+        }
+    }
+
+    private fun regionFor(bitmap: Bitmap, state: GalleryScanUiState): RegionOfInterest {
+        val width = bitmap.width * state.roiFraction
+        val height = bitmap.height * state.roiFraction
+        val centerX = bitmap.width / 2f + state.roiOffsetXFraction * bitmap.width
+        val centerY = bitmap.height / 2f + state.roiOffsetYFraction * bitmap.height
+
+        return RegionOfInterest(
+            x = (centerX - width / 2f).coerceIn(0f, bitmap.width - width),
+            y = (centerY - height / 2f).coerceIn(0f, bitmap.height - height),
+            width = width,
+            height = height
+        )
+    }
+
     private fun analyzeUri(uri: Uri) {
         viewModelScope.launch {
             try {
@@ -72,7 +109,10 @@ class GalleryScanViewModel(
                         context = requireNotNull(applicationContext),
                         uri = uri
                     )
-                    val sampledColor = colorSampler.sampleCenter(bitmap = bitmap)
+                    val sampledColor = colorSampler.sampleRegion(
+                        bitmap = bitmap,
+                        region = regionFor(bitmap, _uiState.value)
+                    )
                     colorAnalyzer.analyzeColor(
                         rgbColor = sampledColor,
                         regionOfInterest = null,
@@ -124,5 +164,11 @@ class GalleryScanViewModel(
 
             onReady()
         }
+    }
+
+    private companion object {
+        const val MIN_ROI_FRACTION = 0.10f
+        const val MAX_ROI_FRACTION = 0.85f
+        const val MAX_OFFSET_FRACTION = 0.5f
     }
 }

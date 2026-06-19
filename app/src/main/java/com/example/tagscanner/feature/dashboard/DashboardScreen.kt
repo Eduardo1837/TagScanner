@@ -38,10 +38,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tagscanner.R
+import com.example.tagscanner.core.locale.ClassificationLocalizer
 import com.example.tagscanner.core.util.formatTimestamp
 import com.example.tagscanner.domain.model.ScanResult
 import com.example.tagscanner.ui.components.ColorSwatch
@@ -83,7 +86,7 @@ private fun DashboardContent(
             .padding(16.dp)
     ) {
         Text(
-            text = "Dashboard",
+            text = stringResource(R.string.dashboard_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF111827)
@@ -138,8 +141,8 @@ private fun DashboardContent(
         uiState.latestScan?.let { scan ->
             LatestScanCard(scan = scan)
         } ?: EmptyState(
-            title = "No scan data",
-            description = "Scan tags to see dashboard insights"
+            title = stringResource(R.string.dashboard_no_scan_data_title),
+            description = stringResource(R.string.dashboard_no_scan_data_desc)
         )
     }
 }
@@ -152,14 +155,14 @@ private fun SummaryGrid(
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             SummaryStatCard(
                 value = uiState.totalScans.toString(),
-                label = "Total Scans",
+                label = stringResource(R.string.dashboard_stat_total_scans),
                 valueColor = Color(0xFF111827),
                 modifier = Modifier.weight(1f)
             )
 
             SummaryStatCard(
                 value = "${uiState.averageQuality}%",
-                label = "Avg Quality",
+                label = stringResource(R.string.dashboard_stat_avg_quality),
                 valueColor = Color(0xFF16A34A),
                 modifier = Modifier.weight(1f)
             )
@@ -167,15 +170,15 @@ private fun SummaryGrid(
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             SummaryStatCard(
-                value = uiState.bestProvider ?: "-",
-                label = "Best Provider",
+                value = uiState.bestProvider ?: stringResource(R.string.dashboard_stat_best_provider_placeholder),
+                label = stringResource(R.string.dashboard_stat_best_provider),
                 valueColor = Color(0xFF111827),
                 modifier = Modifier.weight(1f)
             )
 
             SummaryStatCard(
                 value = "${(uiState.criticalRate * 100).toInt()}%",
-                label = "Critical Rate",
+                label = stringResource(R.string.dashboard_stat_critical_rate),
                 valueColor = Color(0xFFDC2626),
                 modifier = Modifier.weight(1f)
             )
@@ -235,7 +238,7 @@ private fun LatestScanCard(
         ) {
             SectionTitle(
                 icon = Icons.Filled.TrackChanges,
-                title = "Latest Scan"
+                title = stringResource(R.string.dashboard_latest_scan)
             )
 
             Spacer(Modifier.height(12.dp))
@@ -249,7 +252,7 @@ private fun LatestScanCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = scan.interpretation.label,
+                            text = ClassificationLocalizer.label(scan.interpretation.label),
                             modifier = Modifier.weight(1f),
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFF111827)
@@ -269,7 +272,7 @@ private fun LatestScanCard(
                     Spacer(Modifier.height(2.dp))
 
                     Text(
-                        text = "Confidence: ${(measurement.confidence * 100).toInt()}%",
+                        text = stringResource(R.string.dashboard_confidence, (measurement.confidence * 100).toInt()),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color(0xFF6B7280)
                     )
@@ -294,7 +297,7 @@ private fun QualityTrendCard(
         ) {
             SectionTitle(
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
-                title = "Quality Trend"
+                title = stringResource(R.string.dashboard_quality_trend)
             )
 
             Spacer(Modifier.height(16.dp))
@@ -309,7 +312,7 @@ private fun QualityTrendCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No trend data available",
+                        text = stringResource(R.string.dashboard_no_trend_data),
                         color = Color(0xFF6B7280),
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -341,9 +344,9 @@ private fun QualityTrendCard(
                 val last = values.last()
 
                 val trendText = when {
-                    last > first -> "Quality improving over time"
-                    last < first -> "Quality declining over time"
-                    else -> "Quality stable over time"
+                    last > first -> stringResource(R.string.dashboard_trend_improving)
+                    last < first -> stringResource(R.string.dashboard_trend_declining)
+                    else -> stringResource(R.string.dashboard_trend_stable)
                 }
 
                 val trendColor = when {
@@ -380,13 +383,13 @@ private fun DistributionCard(
         ) {
             SectionTitle(
                 icon = Icons.Filled.BarChart,
-                title = "Distribution"
+                title = stringResource(R.string.dashboard_distribution)
             )
 
             Spacer(Modifier.height(12.dp))
 
             DistributionRow(
-                label = "Normal",
+                label = stringResource(R.string.dashboard_distribution_normal),
                 count = normalCount,
                 total = totalScans,
                 color = Color(0xFF22C55E)
@@ -395,7 +398,7 @@ private fun DistributionCard(
             Spacer(Modifier.height(10.dp))
 
             DistributionRow(
-                label = "Warning",
+                label = stringResource(R.string.dashboard_distribution_warning),
                 count = warningCount,
                 total = totalScans,
                 color = Color(0xFFF59E0B)
@@ -404,7 +407,7 @@ private fun DistributionCard(
             Spacer(Modifier.height(10.dp))
 
             DistributionRow(
-                label = "Critical",
+                label = stringResource(R.string.dashboard_distribution_critical),
                 count = criticalCount,
                 total = totalScans,
                 color = Color(0xFFEF4444)
@@ -492,7 +495,7 @@ private fun ProviderComparisonCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "Provider Comparison",
+                text = stringResource(R.string.dashboard_provider_comparison),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF111827)
@@ -502,7 +505,7 @@ private fun ProviderComparisonCard(
 
             if (providers.isEmpty()) {
                 Text(
-                    text = "No provider data available",
+                    text = stringResource(R.string.dashboard_no_provider_data),
                     color = Color(0xFF6B7280),
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -568,7 +571,13 @@ private fun ProviderRow(
             Spacer(Modifier.height(2.dp))
 
             Text(
-                text = "${provider.totalScans} scans • ${provider.normalCount} normal • ${provider.warningCount} warning • ${provider.criticalCount} critical",
+                text = stringResource(
+                    R.string.dashboard_provider_summary,
+                    provider.totalScans,
+                    provider.normalCount,
+                    provider.warningCount,
+                    provider.criticalCount
+                ),
                 color = Color(0xFF6B7280),
                 style = MaterialTheme.typography.labelSmall
             )
@@ -590,7 +599,7 @@ private fun BatchComparisonCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "Batch Comparison",
+                text = stringResource(R.string.dashboard_batch_comparison),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF111827)
@@ -600,7 +609,7 @@ private fun BatchComparisonCard(
 
             if (batches.isEmpty()) {
                 Text(
-                    text = "No batch data available",
+                    text = stringResource(R.string.dashboard_no_batch_data),
                     color = Color(0xFF6B7280),
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -641,7 +650,11 @@ private fun BatchRow(
             Spacer(Modifier.height(2.dp))
 
             Text(
-                text = "${batch.warningCount} warnings • ${batch.criticalCount} critical",
+                text = stringResource(
+                    R.string.dashboard_batch_summary,
+                    batch.warningCount,
+                    batch.criticalCount
+                ),
                 color = Color(0xFF6B7280),
                 style = MaterialTheme.typography.labelSmall
             )
@@ -667,7 +680,7 @@ private fun DashboardFilters(
         FilterChipRow(
             values = DashboardTimeRange.entries.toList(),
             selectedValue = uiState.selectedTimeRange,
-            labelFor = { it.label },
+            labelFor = { timeRangeLabel(it) },
             onSelected = onTimeRangeSelected
         )
 
@@ -686,13 +699,13 @@ private fun DashboardFilters(
 //        )
 
         SearchableDropdownFilter(
-            label = "Provider",
+            label = stringResource(R.string.dashboard_filter_provider),
             options = uiState.availableProviders,
             selectedValue = uiState.selectedProvider,
             onValueSelected = onProviderSelected
         )
         SearchableDropdownFilter(
-            label = "Product / Category",
+            label = stringResource(R.string.dashboard_filter_product_category),
             options = uiState.availableProductsOrCategories,
             selectedValue = uiState.selectedProductOrCategory,
             onValueSelected = onProductOrCategorySelected
@@ -701,10 +714,18 @@ private fun DashboardFilters(
 }
 
 @Composable
+private fun timeRangeLabel(timeRange: DashboardTimeRange): String = when (timeRange) {
+    DashboardTimeRange.TODAY -> stringResource(R.string.dashboard_time_today)
+    DashboardTimeRange.LAST_7_DAYS -> stringResource(R.string.dashboard_time_last_7_days)
+    DashboardTimeRange.LAST_30_DAYS -> stringResource(R.string.dashboard_time_last_30_days)
+    DashboardTimeRange.ALL_TIME -> stringResource(R.string.dashboard_time_all_time)
+}
+
+@Composable
 private fun <T> FilterChipRow(
     values: List<T>,
     selectedValue: T,
-    labelFor: (T) -> String,
+    labelFor: @Composable (T) -> String,
     onSelected: (T) -> Unit
 ) {
     Row(
@@ -745,7 +766,7 @@ private fun FilterStringRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             SmallFilterChip(
-                label = "All",
+                label = stringResource(R.string.dashboard_filter_all),
                 selected = selectedValue == null,
                 onClick = { onSelected(null) }
             )
@@ -820,7 +841,11 @@ fun SearchableDropdownFilter(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "$label: ${selectedValue ?: "All"}",
+                    text = stringResource(
+                        R.string.dashboard_filter_label_value,
+                        label,
+                        selectedValue ?: stringResource(R.string.dashboard_filter_all)
+                    ),
                     color = if (selectedValue != null) Color.White else Color.Black,
                     fontWeight = FontWeight.Bold,
                     fontSize = 13.sp
@@ -846,7 +871,7 @@ fun SearchableDropdownFilter(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search...") },
+                placeholder = { Text(stringResource(R.string.dashboard_search_placeholder)) },
                 singleLine = true,
                 modifier = Modifier
                     .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -855,7 +880,7 @@ fun SearchableDropdownFilter(
 
             // "All" option
             DropdownMenuItem(
-                text = { Text("All") },
+                text = { Text(stringResource(R.string.dashboard_filter_all)) },
                 onClick = {
                     onValueSelected(null)
                     expanded = false
@@ -900,7 +925,7 @@ private fun RecentProblematicScansCard(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = "Recent Problematic Scans",
+                text = stringResource(R.string.dashboard_recent_problematic_scans),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF111827)
@@ -910,7 +935,7 @@ private fun RecentProblematicScansCard(
 
             if (scans.isEmpty()) {
                 Text(
-                    text = "No warning or critical scans",
+                    text = stringResource(R.string.dashboard_no_warning_critical_scans),
                     color = Color(0xFF6B7280),
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -950,7 +975,7 @@ private fun ProblematicScanRow(
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = details?.provider ?: "Unknown provider",
+                    text = details?.provider ?: stringResource(R.string.dashboard_unknown_provider),
                     modifier = Modifier.weight(1f),
                     color = Color(0xFF111827),
                     fontWeight = FontWeight.Medium,
@@ -962,8 +987,9 @@ private fun ProblematicScanRow(
 
             Spacer(Modifier.height(2.dp))
 
+            val dash = stringResource(R.string.scan_details_placeholder_dash)
             Text(
-                text = "${details?.product ?: "-"} - ${details?.batch ?: "-"}",
+                text = "${details?.product ?: dash} - ${details?.batch ?: dash}",
                 color = Color(0xFF6B7280),
                 style = MaterialTheme.typography.labelSmall
             )

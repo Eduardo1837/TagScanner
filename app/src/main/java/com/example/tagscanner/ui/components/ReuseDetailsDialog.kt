@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.tagscanner.R
 import com.example.tagscanner.domain.model.ScanDetails
 
 @Composable
@@ -21,31 +23,31 @@ fun ReuseDetailsDialog(
     AlertDialog(
         onDismissRequest = onDismissReuse,
         title = {
-            Text("Reuse these details?")
+            Text(stringResource(R.string.reuse_dialog_title))
         },
         text = {
             Column {
-                Text("Use this provider, product, and batch for the next scans?")
+                Text(stringResource(R.string.reuse_dialog_message))
 
                 Spacer(Modifier.height(12.dp))
 
-                Text("Provider: ${details.provider}")
-                Text("Product: ${details.product}")
-                Text("Batch: ${details.batch}")
+                Text(stringResource(R.string.reuse_dialog_provider, details.provider))
+                Text(stringResource(R.string.reuse_dialog_product, details.product))
+                Text(stringResource(R.string.reuse_dialog_batch, details.batch))
 
                 details.category?.let {
-                    Text("Category: $it")
+                    Text(stringResource(R.string.reuse_dialog_category, it))
                 }
             }
         },
         confirmButton = {
             Button(onClick = onConfirmReuse) {
-                Text("Yes, reuse")
+                Text(stringResource(R.string.reuse_dialog_confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismissReuse) {
-                Text("No, only this scan")
+                Text(stringResource(R.string.reuse_dialog_dismiss))
             }
         }
     )

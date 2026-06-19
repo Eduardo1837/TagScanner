@@ -20,9 +20,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tagscanner.R
+import com.example.tagscanner.core.locale.ClassificationLocalizer
 import com.example.tagscanner.core.util.qualityScoreFor
 import com.example.tagscanner.domain.repository.ActiveScanDetailsRepository
 import com.example.tagscanner.domain.repository.PendingScanResultRepository
@@ -89,7 +92,7 @@ private fun SaveScanDetailsContent(
             .padding(16.dp)
     ) {
         Text(
-            text = "Save Scan Details",
+            text = stringResource(R.string.save_scan_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             color = Color(0xFF111827)
@@ -104,8 +107,8 @@ private fun SaveScanDetailsContent(
         DetailsTextField(
             value = uiState.provider,
             onValueChange = onProviderChanged,
-            label = "Provider *",
-            placeholder = "Enter provider name"
+            label = stringResource(R.string.save_scan_provider_label),
+            placeholder = stringResource(R.string.save_scan_provider_placeholder)
         )
 
         Spacer(Modifier.height(12.dp))
@@ -113,8 +116,8 @@ private fun SaveScanDetailsContent(
         DetailsTextField(
             value = uiState.product,
             onValueChange = onProductChanged,
-            label = "Product *",
-            placeholder = "Enter product name"
+            label = stringResource(R.string.save_scan_product_label),
+            placeholder = stringResource(R.string.save_scan_product_placeholder)
         )
 
         Spacer(Modifier.height(12.dp))
@@ -122,8 +125,8 @@ private fun SaveScanDetailsContent(
         DetailsTextField(
             value = uiState.batch,
             onValueChange = onBatchChanged,
-            label = "Batch Code *",
-            placeholder = "Enter batch code"
+            label = stringResource(R.string.save_scan_batch_label),
+            placeholder = stringResource(R.string.save_scan_batch_placeholder)
         )
 
         Spacer(Modifier.height(12.dp))
@@ -131,7 +134,7 @@ private fun SaveScanDetailsContent(
         DetailsTextField(
             value = uiState.category,
             onValueChange = {},
-            label = "Category",
+            label = stringResource(R.string.save_scan_category_label),
             placeholder = "",
             enabled = !uiState.categoryLocked
         )
@@ -141,14 +144,14 @@ private fun SaveScanDetailsContent(
         DetailsTextField(
             value = uiState.note,
             onValueChange = onNoteChanged,
-            label = "Notes",
-            placeholder = "Optional notes"
+            label = stringResource(R.string.save_scan_notes_label),
+            placeholder = stringResource(R.string.save_scan_notes_placeholder)
         )
 
         Spacer(Modifier.height(16.dp))
 
         Text(
-            text = "Recent Suggestions",
+            text = stringResource(R.string.save_scan_recent_suggestions),
             style = MaterialTheme.typography.labelMedium,
             color = Color(0xFF6B7280)
         )
@@ -175,7 +178,7 @@ private fun SaveScanDetailsContent(
             enabled = uiState.canSave,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Save scan")
+            Text(stringResource(R.string.save_scan_save_button))
         }
 
         Spacer(Modifier.height(8.dp))
@@ -184,7 +187,7 @@ private fun SaveScanDetailsContent(
             onClick = onCancelClick,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Cancel")
+            Text(stringResource(R.string.save_scan_cancel_button))
         }
     }
 }
@@ -203,18 +206,22 @@ private fun ScanResultPreview(
     }
 
     val status = if (interpretation != null){
-        "${interpretation.label} / ${interpretation.severity.name.lowercase().replaceFirstChar { it.uppercase() }}"
+        stringResource(
+            R.string.save_scan_status_label_severity,
+            ClassificationLocalizer.label(interpretation.label),
+            ClassificationLocalizer.severityLabel(interpretation.severity)
+        )
     } else {
-        "No scan result"
+        stringResource(R.string.save_scan_no_result)
     }
     val quality = uiState.scanResult
         ?.let { "${qualityScoreFor(it)}%" }
-        ?: "-"
+        ?: stringResource(R.string.save_scan_dash)
     val confidence = measurement?.confidence
         ?.times(100)
         ?.toInt()
         ?.let { "$it%" }
-        ?: "91%"
+        ?: stringResource(R.string.save_scan_default_confidence)
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -237,7 +244,7 @@ private fun ScanResultPreview(
                 Spacer(Modifier.height(4.dp))
 
                 Text(
-                    text = "Quality: $quality • Confidence: $confidence",
+                    text = stringResource(R.string.save_scan_quality_confidence, quality, confidence),
                     color = Color(0xFF6B7280),
                     style = MaterialTheme.typography.labelSmall
                 )
