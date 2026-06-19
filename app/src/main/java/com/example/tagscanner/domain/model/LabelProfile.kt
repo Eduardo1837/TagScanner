@@ -33,71 +33,75 @@ sealed class LabelProfile(
     val displayName: String,
     val colorRules: List<ColorRule>
 ) {
-    // ── Produse Lactate ───────────────────────────────────────────────────────
-    // Indicator: TTI Acid Lactic — acumulare acid lactic bacterian.
-    // Progresie: verde închis → galben-verzui → portocaliu → roșu
+    // ── Dairy Products ───────────────────────────────────────────────────────
+    // Indicator: TTI Lactic Acid — bacterial lactic acid buildup.
+    // Progression: dark green → yellow-green → orange → red
     object ProduseLactate : LabelProfile(
         id = "produse_lactate",
-        displayName = "Produse Lactate",
+        displayName = "Dairy Products",
         colorRules = listOf(
             ColorRule(
                 hueRanges = listOf(100f..160f),
-                label = "Proaspăt",
-                description = "Produs proaspăt. Acumulare minimă de acid lactic.",
+                minSaturation = 0.15f,
+                label = "Fresh",
+                description = "Fresh product. Minimal lactic acid buildup.",
                 severity = InterpretationSeverity.NORMAL
             ),
             ColorRule(
                 hueRanges = listOf(65f..99f),
-                label = "Degradare incipientă",
-                description = "Început de fermentație bacteriană. Consumați cât mai curând.",
+                minSaturation = 0.15f,
+                label = "Early Spoilage",
+                description = "Onset of bacterial fermentation. Consume as soon as possible.",
                 severity = InterpretationSeverity.WARNING
             ),
             ColorRule(
                 hueRanges = listOf(18f..38f),
-                label = "Degradare avansată",
-                description = "Activitate bacteriană semnificativă. Produsul nu este recomandat.",
+                minSaturation = 0.15f,
+                label = "Advanced Spoilage",
+                description = "Significant bacterial activity. Product not recommended.",
                 severity = InterpretationSeverity.CRITICAL
             ),
             ColorRule(
                 hueRanges = listOf(0f..17f, 339f..360f),
-                label = "Alterat",
-                description = "Produsul nu mai este sigur pentru consum.",
+                minSaturation = 0.15f,
+                label = "Spoiled",
+                description = "Product is no longer safe for consumption.",
                 severity = InterpretationSeverity.CRITICAL
             )
         )
     )
 
-    // ── Pește & Fructe de Mare ────────────────────────────────────────────────
-    // Indicator: Bromocresol — detectează amine volatile (amoniac, TMA).
-    // Progresie: galben-muștar → verde olive → gri închis → mov-violet
+    // ── Fish & Seafood ────────────────────────────────────────────────────────
+    // Indicator: Bromocresol — detects volatile amines (ammonia, TMA).
+    // Progression: mustard-yellow → olive green → dark gray → purple-violet
     object PesteSiFructeDeMare : LabelProfile(
         id = "peste_fructe_mare",
-        displayName = "Pește & Fructe de Mare",
+        displayName = "Fish & Seafood",
         colorRules = listOf(
             ColorRule(
                 hueRanges = listOf(40f..55f),
                 minSaturation = 0.50f,
                 minValue = 0.60f,
-                label = "Proaspăt",
-                description = "Produs proaspăt. Nivel minim de amine volatile.",
+                label = "Fresh",
+                description = "Fresh product. Minimal level of volatile amines.",
                 severity = InterpretationSeverity.NORMAL
             ),
             ColorRule(
-                hueRanges = listOf(100f..145f),
+                hueRanges = listOf(56f..145f),
                 minSaturation = 0.20f,
                 minValue = 0.20f,
                 maxValue = 0.50f,
-                label = "Degradare incipientă",
-                description = "Creștere ușoară a aminelor volatile. Consumați cât mai curând.",
+                label = "Early Spoilage",
+                description = "Slight increase in volatile amines. Consume as soon as possible.",
                 severity = InterpretationSeverity.WARNING
             ),
             // Stage 3: any hue, low saturation + low brightness — checked before quality guards
             ColorRule(
                 hueRanges = emptyList(),
                 maxSaturation = 0.15f,
-                maxValue = 0.20f,
-                label = "Degradare medie",
-                description = "Nivel ridicat de amoniac și trimetilamină. Produs nerecomandat.",
+                maxValue = 0.35f,
+                label = "Advanced Spoilage",
+                description = "High level of ammonia and trimethylamine. Product not recommended.",
                 severity = InterpretationSeverity.CRITICAL
             ),
             ColorRule(
@@ -105,76 +109,84 @@ sealed class LabelProfile(
                 minSaturation = 0.30f,
                 minValue = 0.30f,
                 maxValue = 0.65f,
-                label = "Alterat",
-                description = "Produs complet alterat. Nu consumați.",
+                label = "Spoiled",
+                description = "Product completely spoiled. Do not consume.",
                 severity = InterpretationSeverity.CRITICAL
             )
         )
     )
 
-    // ── Carne Roșie ──────────────────────────────────────────────────────────
-    // Indicator: Antocianine naturale (varză roșie) — sensibil la baze volatile.
-    // Progresie: roșu-purpuriu → mov → albastru → albastru-verzui
+    // ── Red Meat ──────────────────────────────────────────────────────────────
+    // Indicator: Natural anthocyanins (red cabbage) — sensitive to volatile bases.
+    // Progression: red-purple → violet → blue → blue-green
     object CarneRosie : LabelProfile(
         id = "carne_rosie",
-        displayName = "Carne Roșie",
+        displayName = "Red Meat",
         colorRules = listOf(
             ColorRule(
                 hueRanges = listOf(310f..360f, 0f..15f),
-                label = "Proaspătă",
-                description = "Carne proaspătă. pH normal, amine biogene absente.",
+                minSaturation = 0.15f,
+                label = "Fresh",
+                description = "Fresh meat. Normal pH, biogenic amines absent.",
                 severity = InterpretationSeverity.NORMAL
             ),
             ColorRule(
-                hueRanges = listOf(280f..309f),
-                label = "Degradare incipientă",
-                description = "Creștere ușoară a pH-ului din ambalaj. Consumați în aceeași zi.",
+                hueRanges = listOf(266f..309f),
+                minSaturation = 0.15f,
+                label = "Early Spoilage",
+                description = "Slight pH increase from packaging. Consume the same day.",
                 severity = InterpretationSeverity.WARNING
             ),
             ColorRule(
-                hueRanges = listOf(210f..265f),
-                label = "Degradare medie",
-                description = "Nivel semnificativ de amine biogene. Produs nerecomandat.",
+                hueRanges = listOf(196f..265f),
+                minSaturation = 0.15f,
+                label = "Advanced Spoilage",
+                description = "Significant level of biogenic amines. Product not recommended.",
                 severity = InterpretationSeverity.CRITICAL
             ),
             ColorRule(
                 hueRanges = listOf(155f..195f),
-                label = "Alterată",
-                description = "Carne complet alterată. Nu consumați.",
+                minSaturation = 0.15f,
+                label = "Spoiled",
+                description = "Meat completely spoiled. Do not consume.",
                 severity = InterpretationSeverity.CRITICAL
             )
         )
     )
 
-    // ── Carne de Pasăre ──────────────────────────────────────────────────────
-    // Indicator: AIEgen pe hârtie — compuși fluorescenți, sensibilitate ridicată.
-    // Progresie: albastru-cobalt → cyan → verde-sage → galben-ocru
+    // ── Poultry ───────────────────────────────────────────────────────────────
+    // Indicator: AIEgen on paper — fluorescent compounds, high sensitivity.
+    // Progression: cobalt blue → cyan → sage green → ochre yellow
     object CarneDePassare : LabelProfile(
         id = "carne_pasare",
-        displayName = "Carne de Pasăre",
+        displayName = "Poultry",
         colorRules = listOf(
             ColorRule(
                 hueRanges = listOf(210f..245f),
-                label = "Proaspătă",
-                description = "Carne proaspătă. Nivel nedetectabil de amine biogene.",
+                minSaturation = 0.15f,
+                label = "Fresh",
+                description = "Fresh meat. Undetectable level of biogenic amines.",
                 severity = InterpretationSeverity.NORMAL
             ),
             ColorRule(
                 hueRanges = listOf(175f..209f),
-                label = "Degradare incipientă",
-                description = "Urme de putresceină/cadaverină detectate. Consumați curând.",
+                minSaturation = 0.15f,
+                label = "Early Spoilage",
+                description = "Traces of putrescine/cadaverine detected. Consume soon.",
                 severity = InterpretationSeverity.WARNING
             ),
             ColorRule(
-                hueRanges = listOf(130f..174f),
-                label = "Degradare avansată",
-                description = "Concentrație ridicată de amine biogene. Produs nerecomandat.",
+                hueRanges = listOf(66f..174f),
+                minSaturation = 0.15f,
+                label = "Advanced Spoilage",
+                description = "High concentration of biogenic amines. Product not recommended.",
                 severity = InterpretationSeverity.CRITICAL
             ),
             ColorRule(
                 hueRanges = listOf(35f..65f),
-                label = "Alterată",
-                description = "Carne complet alterată. Nu consumați.",
+                minSaturation = 0.15f,
+                label = "Spoiled",
+                description = "Meat completely spoiled. Do not consume.",
                 severity = InterpretationSeverity.CRITICAL
             )
         )

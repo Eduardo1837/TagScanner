@@ -84,7 +84,7 @@ fun ProfileSelectorRow(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Categorie:",
+            text = "Category:",
             style = MaterialTheme.typography.labelSmall,
             color = Color(0xFF6B7280)
         )
@@ -117,7 +117,7 @@ fun ProfileSelectorRow(modifier: Modifier = Modifier) {
             )
             Icon(
                 imageVector = Icons.Filled.ExpandMore,
-                contentDescription = "Schimbă categoria",
+                contentDescription = "Change category",
                 tint = activeProfile.accentColor,
                 modifier = Modifier
                     .size(16.dp)
@@ -167,14 +167,14 @@ private fun ProfilePickerDialog(
                 ) {
                     // Header
                     Text(
-                        text = "Tip produs",
+                        text = "Product Type",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF111827)
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Selectează categoria produsului scanat",
+                        text = "Select the category of the scanned product",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFF6B7280)
                     )

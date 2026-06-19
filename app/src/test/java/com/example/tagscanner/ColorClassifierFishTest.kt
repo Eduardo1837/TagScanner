@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 /**
- * Regression suite for the Bromocresol / Pește & Fructe de Mare classifier.
+ * Regression suite for the Bromocresol / Fish & Seafood classifier.
  *
  * Each row is a real scan captured from the app. Add a new row whenever a
  * scan is misclassified — run `./gradlew test` to verify the fix before
@@ -58,34 +58,34 @@ class ColorClassifierFishTest(
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun data() = listOf(
-            // ── Stage 1 – Proaspăt ───────────────────────────────────────────
-            // RGB(223,186,102) — scan real, limita inf. a hue-ului (fix: 45→40°)
-            arrayOf("Proaspăt – hue=42", 42f, 0.584211f, 0.745098f,
-                "Proaspăt", InterpretationSeverity.NORMAL),
-            // RGB(190,157,79) — scan real
-            arrayOf("Proaspăt – hue=41", 41f, 0.542601f, 0.874510f,
-                "Proaspăt", InterpretationSeverity.NORMAL),
-            // RGB(178,146,65) — scan real
-            arrayOf("Proaspăt – hue=43", 43f, 0.634832f, 0.698039f,
-                "Proaspăt", InterpretationSeverity.NORMAL),
+            // ── Stage 1 – Fresh ────────────────────────────────────────────────
+            // RGB(223,186,102) — real scan, lower hue bound (fix: 45→40°)
+            arrayOf("Fresh – hue=42", 42f, 0.584211f, 0.745098f,
+                "Fresh", InterpretationSeverity.NORMAL),
+            // RGB(190,157,79) — real scan
+            arrayOf("Fresh – hue=41", 41f, 0.542601f, 0.874510f,
+                "Fresh", InterpretationSeverity.NORMAL),
+            // RGB(178,146,65) — real scan
+            arrayOf("Fresh – hue=43", 43f, 0.634832f, 0.698039f,
+                "Fresh", InterpretationSeverity.NORMAL),
 
-            // ── Stage 2 – Degradare incipientă ───────────────────────────────
-            // RGB(73,106,86) — scan real, sat sub pragul iniţial (fix: 40%→30%)
-            arrayOf("Degradare incipientă – hue=143 sat=0.311", 143f, 0.311321f, 0.415686f,
-                "Degradare incipientă", InterpretationSeverity.WARNING),
-            // RGB(79,108,88) — scan real, sat sub pragul revizuit (fix: 30%→20%)
-            arrayOf("Degradare incipientă – hue=138 sat=0.269", 138f, 0.268519f, 0.423529f,
-                "Degradare incipientă", InterpretationSeverity.WARNING),
+            // ── Stage 2 – Early Spoilage ──────────────────────────────────────
+            // RGB(73,106,86) — real scan, below initial sat threshold (fix: 40%→30%)
+            arrayOf("Early Spoilage – hue=143 sat=0.311", 143f, 0.311321f, 0.415686f,
+                "Early Spoilage", InterpretationSeverity.WARNING),
+            // RGB(79,108,88) — real scan, below revised sat threshold (fix: 30%→20%)
+            arrayOf("Early Spoilage – hue=138 sat=0.269", 138f, 0.268519f, 0.423529f,
+                "Early Spoilage", InterpretationSeverity.WARNING),
 
-            // ── Stage 3 – Degradare medie ────────────────────────────────────
-            // Sintetic: any hue, sat<15%, val<20%
-            arrayOf("Degradare medie – low sat+val", 200f, 0.10f, 0.15f,
-                "Degradare medie", InterpretationSeverity.CRITICAL),
+            // ── Stage 3 – Advanced Spoilage ───────────────────────────────────
+            // Synthetic: any hue, sat<15%, val<35%
+            arrayOf("Advanced Spoilage – low sat+val", 200f, 0.10f, 0.15f,
+                "Advanced Spoilage", InterpretationSeverity.CRITICAL),
 
-            // ── Stage 4 – Alterat ─────────────────────────────────────────────
-            // Sintetic: hue 260-290, sat>30%, val 30-65%
-            arrayOf("Alterat – hue=275", 275f, 0.45f, 0.50f,
-                "Alterat", InterpretationSeverity.CRITICAL),
+            // ── Stage 4 – Spoiled ──────────────────────────────────────────────
+            // Synthetic: hue 260-290, sat>30%, val 30-65%
+            arrayOf("Spoiled – hue=275", 275f, 0.45f, 0.50f,
+                "Spoiled", InterpretationSeverity.CRITICAL),
 
             // ── Edge cases ────────────────────────────────────────────────────
             // Hue in gap between Stage 1 and Stage 2, sat too low for Stage 1,

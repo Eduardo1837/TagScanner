@@ -456,7 +456,7 @@ private fun SavedFeedbackBanner(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Scan salvat cu succes",
+                text = "Scan saved successfully",
                 color = Color.White,
                 fontWeight = FontWeight.Medium,
                 style = MaterialTheme.typography.bodyMedium
