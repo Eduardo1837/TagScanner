@@ -2,7 +2,7 @@ import httpx, random
 from datetime import datetime, timezone, timedelta
 
 SUPABASE_URL = "https://qkqrtiitlmhgidnqczbg.supabase.co"
-SUPABASE_KEY = "sb_secret_ewt_ntAy7ZDzXTI2mDTZ5A_6TK9zPZJ"
+SUPABASE_KEY = ""
 
 headers = {
     "apikey": SUPABASE_KEY,
